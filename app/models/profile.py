@@ -73,3 +73,6 @@ class Profile(Base):
         default=datetime.utcnow,
         onupdate=datetime.utcnow
     )
+    user: Mapped["User"] = relationship(
+        back_populates="profile"
+    )
