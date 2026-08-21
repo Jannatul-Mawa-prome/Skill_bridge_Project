@@ -1,11 +1,11 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from app.schemas.auth import UserRegisterRequest
+from app.schemas.auth import UserRegisterRequest, UserLoginRequest
 from app.models.user import User
 from app.models.profile import Profile
 from app.repositories.user_repository import UserRepository
-from app.core.security import hash_password
+from app.core.security import hash_password, verify_password
 
 class AuthService:
     @staticmethod
@@ -48,4 +48,38 @@ class AuthService:
                 "edu_email": user.edu_email,
                 "roll": profile.roll
             }
+        }
+    @staticmethod
+    def login_user(db: Session, user_data: UserLoginRequest):
+
+        user = db.query(User).filter(
+            User.edu_email == user_data.edu_email
+        ).first()
+
+        if not user:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid email or password"
+            )
+
+        if not verify_password(
+            user_data.password,
+            user.password_hash
+        ):
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid email or password"
+            )
+
+        if not user.is_active:
+            raise HTTPException(
+                status_code=403,
+                detail="User account is inactive"
+            )
+
+        return {
+            "message": "Login successful",
+            "user_id": user.id,
+            "edu_email": user.edu_email,
+            "full_name": user.profile.full_name
         }

@@ -23,28 +23,21 @@
 
     <!-- CSS -->
     <link rel="stylesheet" href="../css/community.css">
+    <link rel="stylesheet" href="../css/navbar.css">
 </head>
 
 <body>
 
     <!-- ================= NAVBAR ================= -->
-    <header class="navbar">
+    <header >
 
-        <div class="nav-container">
-
-            <!-- Logo -->
-            <a href="index.html" class="logo">
-                <div class="logo-icon">
-                    <i class="fa-solid fa-book-open"></i>
-                </div>
-
-                <span>Skill<span>Bridge</span></span>
-            </a>
-
-            <!-- Navigation -->
-            <nav class="nav-links">
-
-                <a href="index.html">
+        <nav class="navbar">
+        <a href="index.html" class="logo">
+            <img src="../assets/images/logo1.png" alt="SkillBridge Logo" style="height: 30px; width: auto;">
+            <span class="logo-text">Skill<span class="highlight">Bridge</span></span>
+        </a>
+        <ul class="nav-links" id="navLinks">
+              <a href="index.html">
                     Home
                 </a>
 
@@ -68,23 +61,43 @@
                     Contact
                 </a>
 
-            </nav>
+        </ul>
+        <div class="nav-buttons" id="navButtons">
 
-            <!-- Buttons -->
-            <div class="nav-buttons">
+    <a href="login.html" class="login-btn" id="loginBtn">
+        Login
+    </a>
 
-                <a href="#" class="login-btn">
-                    Login
+    <a href="register.html" class="signup-btn" id="signupBtn">
+        Get Started
+    </a>
+
+    <div class="user-menu" id="userMenu" style="display: none;">
+            <button class="user-menu-btn" id="userMenuBtn">
+                 <span id="userName" style="color: #2563eb;"></span>
+                <span class="dropdown-arrow">▾</span>
+            </button>
+
+            <div class="user-dropdown" id="userDropdown">
+                <a href="#" class="dropdown-item">
+                    <span>👤</span>
+                    Profile
                 </a>
 
-                <a href="#" class="get-started-btn">
-                    Get Started
-                </a>
-
+                <button class="dropdown-item logout-btn" id="logoutBtn">
+                    <span>🚪</span>
+                    Logout
+                </button>
             </div>
-
         </div>
 
+    </div>
+        <div class="menu-toggle" id="mobileMenu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
     </header>
 
 
@@ -372,6 +385,6 @@
 
     </footer>
 
-
+<script src="../js/navbar.js"></script>
 </body>
 </html>

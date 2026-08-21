@@ -404,12 +404,9 @@ input {
 
 .main-content {
     width: 100%;
-
-    max-width: 1250px;
-
-    padding: 35px 38px 70px;
-
-    margin: auto;
+    max-width: 1450px;
+    padding: 42px 48px 80px;
+    margin: 0 auto;
 }
 
 
@@ -516,8 +513,8 @@ input {
 }
 
 .stat-card {
-    padding: 17px;
-
+    padding: 20px;
+    min-height: 90px;
     background: white;
 
     border: 1px solid #e5eaf1;
@@ -637,7 +634,9 @@ input {
     align-items: flex-end;
 
     justify-content: space-between;
-
+    margin-top: 6px;
+    font-size: 22px;
+    letter-spacing: -0.4px;
     margin-bottom: 17px;
 }
 
@@ -1670,6 +1669,233 @@ input {
     font-size: 8px;
 }
 
+/* =========================================================
+   PROJECTS
+   ========================================================= */
+
+.standalone-section {
+    margin-bottom: 30px;
+}
+
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.project-card {
+    padding: 20px;
+    border: 1px solid #e5eaf1;
+    border-radius: 11px;
+    transition: 0.3s ease;
+}
+
+.project-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 25px rgba(15, 23, 42, 0.06);
+}
+
+.project-icon {
+    width: 42px;
+    height: 42px;
+
+    border-radius: 10px;
+
+    background: #eff6ff;
+    color: #2563eb;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 13px;
+}
+
+.project-card h3 {
+    font-size: 13px;
+}
+
+.project-card p {
+    margin-top: 7px;
+
+    color: #64748b;
+
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+.project-meta {
+    margin-top: 17px;
+
+    display: flex;
+    justify-content: space-between;
+
+    color: #64748b;
+
+    font-size: 9px;
+}
+
+.project-progress {
+    height: 5px;
+
+    margin-top: 8px;
+
+    background: #e2e8f0;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+}
+
+.project-progress div {
+    height: 100%;
+
+    background: #2463eb;
+}
+
+.project-btn {
+    margin-top: 15px;
+
+    border: none;
+
+    background: transparent;
+
+    color: #2463eb;
+
+    font-size: 9px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   EVENTS
+   ========================================================= */
+
+.event-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.event-item {
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 15px 0;
+
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.event-item:last-child {
+    border-bottom: none;
+}
+
+.event-date {
+    width: 48px;
+    height: 52px;
+
+    flex-shrink: 0;
+
+    border-radius: 9px;
+
+    background: #eff6ff;
+
+    color: #2563eb;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+.event-date strong {
+    font-size: 17px;
+}
+
+.event-date span {
+    margin-top: 2px;
+
+    font-size: 8px;
+
+    font-weight: 700;
+}
+
+.event-info {
+    flex: 1;
+}
+
+.event-info h3 {
+    font-size: 11px;
+}
+
+.event-info p {
+    margin-top: 4px;
+
+    color: #64748b;
+
+    font-size: 9px;
+}
+
+.event-info > span {
+    display: block;
+
+    margin-top: 5px;
+
+    color: #94a3b8;
+
+    font-size: 8px;
+}
+
+.event-item button {
+    border: 1px solid #dbe3ee;
+
+    background: white;
+
+    color: #2463eb;
+
+    padding: 8px 11px;
+
+    border-radius: 6px;
+
+    font-size: 9px;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   BETTER DESKTOP SPACING
+   ========================================================= */
+
+@media (min-width: 1200px) {
+
+    .main-content {
+        padding-left: 55px;
+        padding-right: 55px;
+    }
+
+    .stats-grid {
+        gap: 18px;
+    }
+
+    .stat-card {
+        padding: 22px;
+    }
+
+    .content-card {
+        padding: 23px;
+    }
+
+}
+
 
 /* =========================================================
    ANIMATION
@@ -1699,7 +1925,7 @@ input {
 @media (max-width: 1050px) {
 
     .sidebar {
-        width: 205px;
+        width: 255px;
     }
 
     .main-content {
@@ -1780,7 +2006,8 @@ input {
         align-items: flex-start;
 
         flex-direction: column;
-
+        font-size: 32px;
+        letter-spacing: -0.7px;
         gap: 15px;
     }
 
@@ -1832,4 +2059,17 @@ input {
         grid-template-columns: 1fr 1fr;
     }
 
+}
+
+
+#roadmap,
+#challenges,
+#discussions,
+#resources,
+#projects,
+#members,
+#announcements,
+#leaderboard,
+#events {
+    scroll-margin-top: 95px;
 }

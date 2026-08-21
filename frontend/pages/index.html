@@ -52,9 +52,35 @@
                 </a>
 
         </ul>
-        <div class="nav-buttons">
-            <a href="login.html" class="login-btn">Login</a>
-            <a href="register.html" class="signup-btn">Get Started</a>
+        <div class="nav-buttons" id="navButtons">
+
+            <a href="login.html" class="login-btn" id="loginBtn">
+                Login
+            </a>
+
+            <a href="register.html" class="signup-btn" id="signupBtn">
+                Get Started
+            </a>
+
+            <div class="user-menu" id="userMenu" style="display: none;">
+                <button class="user-menu-btn" id="userMenuBtn">
+                    <span id="userName" style="color: #2563eb;"></span>
+                    <span class="dropdown-arrow">▾</span>
+                </button>
+
+                <div class="user-dropdown" id="userDropdown">
+                    <a href="#" class="dropdown-item">
+                        <span>👤</span>
+                        Profile
+                    </a>
+
+                    <button class="dropdown-item logout-btn" id="logoutBtn">
+                        <span>🚪</span>
+                        Logout
+                    </button>
+                </div>
+            </div>
+
         </div>
         <div class="menu-toggle" id="mobileMenu">
             <span></span>

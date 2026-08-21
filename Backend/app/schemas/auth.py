@@ -15,3 +15,8 @@ class UserRegisterRequest(BaseModel):
         if self.password != self.confirm_password:
             raise ValueError("Password and Confirm Password do not match.")
         return self
+
+
+class UserLoginRequest(BaseModel):
+    edu_email: EmailStr
+    password: str = Field(..., min_length=8)
