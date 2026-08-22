@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const loginForm = document.querySelector(".auth-form");
+    const message = document.getElementById("message");
 
     if (loginForm) {
         loginForm.addEventListener("submit", async (e) => {
@@ -7,6 +8,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const email = document.getElementById("login-id").value.trim();
             const password = document.getElementById("password").value;
+
+            // Clear previous message
+            message.innerText = "";
+            message.style.display = "none";
 
             try {
                 const response = await fetch(
@@ -25,9 +30,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const data = await response.json();
 
-                // Wrong email/password
+                // Error from backend
                 if (!response.ok) {
-                    alert(data.detail || "Login failed.");
+                    message.innerText = data.detail || "Login failed.";
+                    message.style.display = "block";
                     return;
                 }
 
@@ -41,7 +47,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             } catch (error) {
                 console.error("Login error:", error);
-                alert("Could not connect to API.");
+                message.style.color = "red";
+                message.innerText = "Could not connect to API.";
+                message.style.display = "block";
             }
         });
     }
