@@ -85,5 +85,6 @@ class AuthService:
             "token_type": "bearer",
             "user_id": user.id,
             "edu_email": user.edu_email,
-            "full_name": user.profile.full_name if user.profile else None
+            "full_name": user.profile.full_name if user.profile else None,
+            "is_admin": user.is_admin,
         }

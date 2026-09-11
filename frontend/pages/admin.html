@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin | SkillBridge</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <aside class="admin-sidebar">
+        <a class="brand" href="admin.html">Skill<span>Bridge</span></a>
+        <nav>
+            <a href="#dashboard">Dashboard</a>
+            <a href="#users">Users</a>
+            <a href="#communities">Communities</a>
+            <a href="#memberships">Memberships</a>
+            <a href="#roadmaps">Roadmaps</a>
+            <a href="#resources">Resources</a>
+            <a href="#announcements">Announcements</a>
+        </nav>
+        <button id="logoutButton">Sign out</button>
+    </aside>
+    <main class="admin-main">
+        <header class="admin-header">
+            <div><span class="eyebrow">ADMINISTRATION</span><h1>Platform control center</h1></div>
+            <span id="adminStatus" class="status">Checking access...</span>
+        </header>
+        <p id="feedback" class="feedback" role="status"></p>
+        <section id="dashboard" class="panel">
+            <div class="section-heading"><div><span class="eyebrow">OVERVIEW</span><h2>Platform health</h2></div><button class="secondary" data-refresh>Refresh</button></div>
+            <div id="statsGrid" class="stats-grid"></div>
+        </section>
+        <section id="users" class="panel"><div class="section-heading"><h2>Users</h2><input id="userSearch" placeholder="Search name, roll or email"></div><div class="table-wrap"><table><thead><tr><th>User</th><th>Profile</th><th>Status</th><th>Admin</th><th>Actions</th></tr></thead><tbody id="usersTable"></tbody></table></div></section>
+        <section id="communities" class="panel"><div class="section-heading"><h2>Communities</h2></div><div class="table-wrap"><table><thead><tr><th>Community</th><th>Members</th><th>Status</th><th>Actions</th></tr></thead><tbody id="communitiesTable"></tbody></table></div></section>
+        <section id="memberships" class="panel"><div class="section-heading"><h2>Memberships</h2></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>User</th><th>Community</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead><tbody id="membershipsTable"></tbody></table></div></section>
+        <section id="roadmaps" class="panel"><div class="section-heading"><h2>Roadmaps</h2></div><div class="table-wrap"><table><thead><tr><th>Title</th><th>Community</th><th>Modules</th><th>Actions</th></tr></thead><tbody id="roadmapsTable"></tbody></table></div></section>
+        <section id="resources" class="panel"><div class="section-heading"><h2>Resources</h2></div><div class="table-wrap"><table><thead><tr><th>Title</th><th>Type</th><th>Difficulty</th><th>Actions</th></tr></thead><tbody id="resourcesTable"></tbody></table></div></section>
+        <section id="announcements" class="panel"><div class="section-heading"><h2>Announcements</h2></div><div class="table-wrap"><table><thead><tr><th>Title</th><th>Community</th><th>Published</th><th>Actions</th></tr></thead><tbody id="announcementsTable"></tbody></table></div></section>
+    </main>
+    <script src="../js/api.js"></script>
+    <script src="../js/admin.js"></script>
+</body>
+</html>

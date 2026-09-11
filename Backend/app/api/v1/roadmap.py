@@ -1,8 +1,13 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database.session import get_db
-from app.models.roadmap import Roadmap, Module, Task,UserTaskProgress
+from app.models.community import CommunityMembership
+from app.models.roadmap import Roadmap, Module, Task, UserTaskProgress
+from app.models.user import User
+from app.core.dependencies import get_current_admin, get_current_user
 from app.schemas.roadmap import (
     RoadmapCreate,
     RoadmapResponse,
@@ -29,7 +34,8 @@ router = APIRouter(
 @router.post("/", response_model=RoadmapResponse)
 def create_roadmap(
     roadmap_data: RoadmapCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _admin: User = Depends(get_current_admin),
 ):
     roadmap = Roadmap(
         community_id=roadmap_data.community_id,
@@ -119,7 +125,8 @@ def get_roadmap_details(
 def create_module(
     roadmap_id: int,
     module_data: ModuleCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _admin: User = Depends(get_current_admin),
 ):
     roadmap = (
         db.query(Roadmap)
@@ -161,7 +168,8 @@ def create_module(
 def create_task(
     module_id: int,
     task_data: TaskCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _admin: User = Depends(get_current_admin),
 ):
     module = (
         db.query(Module)
@@ -198,8 +206,8 @@ def create_task(
 def update_task_progress(
     task_id: int,
     progress_data: TaskProgressUpdate,
-    user_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     task = (
         db.query(Task)
@@ -213,10 +221,26 @@ def update_task_progress(
             detail="Task not found"
         )
 
+    membership = (
+        db.query(CommunityMembership)
+        .join(Roadmap, Roadmap.community_id == CommunityMembership.community_id)
+        .join(Module, Module.roadmap_id == Roadmap.id)
+        .filter(
+            CommunityMembership.user_id == current_user.id,
+            Module.id == task.module_id,
+        )
+        .first()
+    )
+    if not membership:
+        raise HTTPException(
+            status_code=403,
+            detail="You must be a member of this community",
+        )
+
     progress = (
         db.query(UserTaskProgress)
         .filter(
-            UserTaskProgress.user_id == user_id,
+            UserTaskProgress.user_id == current_user.id,
             UserTaskProgress.task_id == task_id
         )
         .first()
@@ -224,7 +248,7 @@ def update_task_progress(
 
     if not progress:
         progress = UserTaskProgress(
-            user_id=user_id,
+            user_id=current_user.id,
             task_id=task_id
         )
 

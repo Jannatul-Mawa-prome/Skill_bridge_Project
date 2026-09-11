@@ -2,6 +2,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 
 from app.models.community import Community, CommunityMembership, AssessmentData
+from app.models.community_answer import CommunityAnswer
+from app.models.community_question import CommunityQuestion
 from app.schemas.community import JoinCommunityRequest
 
 class CommunityRepository:
@@ -31,7 +33,25 @@ class CommunityRepository:
             .where(CommunityMembership.community_id == community_id)
         ).scalar_one_or_none()
 
-    def create_membership(self, user_id: int, community_id: int, assessment_data: JoinCommunityRequest) -> CommunityMembership:
+    def get_membership_answers(self, membership_id: int) -> list[tuple[str, object]]:
+        rows = self.db.execute(
+            select(CommunityAnswer.answer, CommunityQuestion.question_key)
+            .join(
+                CommunityQuestion,
+                CommunityQuestion.id == CommunityAnswer.question_id,
+            )
+            .where(CommunityAnswer.membership_id == membership_id)
+            .order_by(CommunityQuestion.order, CommunityQuestion.id)
+        ).all()
+        return [(question_key, answer) for answer, question_key in rows]
+
+    def create_membership(
+        self,
+        user_id: int,
+        community_id: int,
+        assessment_data: JoinCommunityRequest,
+        answers: list[tuple[CommunityQuestion, object]] | None = None,
+    ) -> CommunityMembership:
         # Create membership
         membership = CommunityMembership(user_id=user_id, community_id=community_id)
         self.db.add(membership)
@@ -53,6 +73,15 @@ class CommunityRepository:
             weekly_time_commitment=assessment_data.weekly_time_commitment
         )
         self.db.add(assessment)
+
+        for question, answer in answers or []:
+            self.db.add(
+                CommunityAnswer(
+                    membership_id=membership.id,
+                    question_id=question.id,
+                    answer=answer,
+                )
+            )
         
         self.db.commit()
         self.db.refresh(membership)

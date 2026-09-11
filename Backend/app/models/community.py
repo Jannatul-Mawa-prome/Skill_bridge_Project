@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 
 if TYPE_CHECKING:
     from app.models.roadmap import Roadmap
+    from app.models.community_question import CommunityQuestion
     
 class Community(Base):
     __tablename__ = "communities"
@@ -19,10 +20,17 @@ class Community(Base):
     name: Mapped[str] = mapped_column(String(100), unique=True, index=True)
     description: Mapped[str] = mapped_column(Text, nullable=True)
     active_members_count: Mapped[int] = mapped_column(Integer, default=0)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     roadmaps: Mapped[List["Roadmap"]] = relationship(
         back_populates="community",
         cascade="all, delete-orphan"
+    )
+
+    questions: Mapped[List["CommunityQuestion"]] = relationship(
+        back_populates="community",
+        cascade="all, delete-orphan",
+        order_by="CommunityQuestion.order",
     )
 
     created_at: Mapped[datetime] = mapped_column(
@@ -50,6 +58,7 @@ class CommunityMembership(Base):
     
     role: Mapped[str] = mapped_column(String(50), default="member")
     streak: Mapped[int] = mapped_column(Integer, default=0)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     joined_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     user: Mapped["User"] = relationship()
@@ -65,10 +74,10 @@ class AssessmentData(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     membership_id: Mapped[int] = mapped_column(ForeignKey("community_memberships.id", ondelete="CASCADE"), unique=True)
     
-    skill_level: Mapped[str] = mapped_column(String(50))
-    languages_known: Mapped[str] = mapped_column(String(255)) # comma separated
-    problem_solving_comfort: Mapped[str] = mapped_column(String(50))
-    main_goal: Mapped[str] = mapped_column(String(100))
-    weekly_time_commitment: Mapped[str] = mapped_column(String(50))
+    skill_level: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    languages_known: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    problem_solving_comfort: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    main_goal: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    weekly_time_commitment: Mapped[str | None] = mapped_column(String(50), nullable=True)
 
     membership: Mapped["CommunityMembership"] = relationship(back_populates="assessment")

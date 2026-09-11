@@ -1032,6 +1032,7 @@
 
 </div>
 
+<script src="../js/api.js"></script>
 <script>
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -1278,6 +1279,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const technologies =
             formData.getAll("technology");
 
+        if (technologies.length === 0) {
+            alert("Please select at least one web technology.");
+            return;
+        }
+
 
         const goal =
             formData.get("goal") ||
@@ -1294,24 +1300,15 @@ document.addEventListener("DOMContentLoaded", () => {
            ----------------------------------------------- */
 
         const data = {
-
-            skill_level:
-                skillLevel,
-
-            languages_known:
-                technologies.length > 0
-                    ? technologies
-                    : ["None"],
-
-            problem_solving_comfort:
-                "basic",
-
-            main_goal:
-                goal,
-
-            weekly_time_commitment:
-                timeCommitment
-
+            answers: [
+                { question_key: "skill_level", value: skillLevel },
+                { question_key: "technologies_known", value: technologies },
+                { question_key: "main_goal", value: goal },
+                {
+                    question_key: "weekly_time_commitment",
+                    value: timeCommitment
+                }
+            ]
         };
 
 
@@ -1344,7 +1341,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
             const response =
-                await fetch(
+                await skillBridgeApi.request(
                     `http://127.0.0.1:8000/api/v1/communities/${communityId}/join`,
                     {
                         method: "POST",
@@ -1370,7 +1367,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (response.ok) {
 
                 window.location.href =
-                    `web_development_community_dashboard.html?id=${communityId}`;
+                    `web_development_dashboard.html?id=${communityId}`;
 
                 return;
 

@@ -14,13 +14,10 @@ document.addEventListener("DOMContentLoaded", () => {
             message.style.display = "none";
 
             try {
-                const response = await fetch(
-                    "http://127.0.0.1:8000/api/v1/auth/login",
+                const response = await skillBridgeApi.request(
+                    "/api/v1/auth/login",
                     {
                         method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
                         body: JSON.stringify({
                             login_id: email,
                             password: password

@@ -5,6 +5,16 @@ from sqlalchemy import pool
 from app.database.connection import Base, engine
 from app.models import User, Profile
 from app.models.community import Community, CommunityMembership, AssessmentData
+from app.models.community_question import CommunityQuestion
+from app.models import (
+    Challenge,
+    UserChallenge,
+    Resource,
+    Discussion,
+    Announcement,
+    Event,
+    EventRegistration,
+)
 
 target_metadata = Base.metadata
 from alembic import context
@@ -45,7 +55,9 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    # Use the same configured database URL as the application. The template
+    # value in alembic.ini is intentionally not a usable connection string.
+    url = str(engine.url)
     context.configure(
         url=url,
         target_metadata=target_metadata,

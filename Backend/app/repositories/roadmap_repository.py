@@ -14,7 +14,7 @@ class RoadmapRepository:
             select(Roadmap)
             .where(Roadmap.community_id == community_id)
             .options(joinedload(Roadmap.modules).joinedload(Module.tasks))
-        ).scalars().first()
+        ).unique().scalars().first()
     
     def create_roadmap(self, community_id: int, title: str, description: str = None) -> Roadmap:
         roadmap = Roadmap(community_id=community_id, title=title, description=description)
@@ -32,6 +32,7 @@ class RoadmapRepository:
             .where(UserTaskProgress.user_id == user_id)
             .where(Module.roadmap_id == roadmap_id)
         ).scalars().all()
+
     
     def mark_task_completed(self, user_id: int, task_id: int) -> UserTaskProgress:
         progress = self.db.execute(

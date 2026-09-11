@@ -920,9 +920,18 @@
 
     </footer>
 
+    <script src="../js/api.js"></script>
     <script>
 
     const joinModal = document.getElementById("joinModal");
+    const pageCommunityId =
+        new URLSearchParams(window.location.search).get("id");
+    const dashboardLink = document.querySelector(".cta-button");
+
+    if (dashboardLink && pageCommunityId) {
+        dashboardLink.href =
+            `programming_dashboard.html?id=${pageCommunityId}`;
+    }
 
     const openJoinModal =
         document.getElementById("openJoinModal");
@@ -1100,19 +1109,39 @@
             const goal = formData.get("goal") || "learn";
             const timeCommitment = formData.get("time") || "2-5 hours";
 
+            if (languages.length === 0) {
+                alert("Please select at least one programming language.");
+                return;
+            }
+
             const data = {
-                skill_level: skillLevel,
-                languages_known: languages.length > 0 ? languages : ["None"],
-                problem_solving_comfort: problemSolving,
-                main_goal: goal,
-                weekly_time_commitment: timeCommitment
+                answers: [
+                    { question_key: "skill_level", value: skillLevel },
+                    {
+                        question_key: "languages_known",
+                        value: languages
+                    },
+                    {
+                        question_key: "problem_solving_comfort",
+                        value: problemSolving
+                    },
+                    { question_key: "main_goal", value: goal },
+                    {
+                        question_key: "weekly_time_commitment",
+                        value: timeCommitment
+                    }
+                ]
             };
 
-            const urlParams = new URLSearchParams(window.location.search);
-            const communityId = urlParams.get('id') || 1;
+            const communityId = pageCommunityId;
+            if (!communityId) {
+                alert("Community ID not found.");
+                window.location.href = "community.html";
+                return;
+            }
 
             try {
-                const response = await fetch(`http://127.0.0.1:8000/api/v1/communities/${communityId}/join`, {
+                const response = await skillBridgeApi.request(`/api/v1/communities/${communityId}/join`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

@@ -2073,3 +2073,8 @@ input {
 #events {
     scroll-margin-top: 95px;
 }
+/* Removed from the student dashboard scope. */
+#projects,
+#leaderboard {
+    display: none !important;
+}
