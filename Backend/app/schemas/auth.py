@@ -18,5 +18,5 @@ class UserRegisterRequest(BaseModel):
 
 
 class UserLoginRequest(BaseModel):
-    edu_email: EmailStr
+    login_id: str = Field(..., description="Edu email or roll number")
     password: str = Field(..., min_length=8)

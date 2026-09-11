@@ -5,7 +5,7 @@ from app.schemas.auth import UserRegisterRequest, UserLoginRequest
 from app.models.user import User
 from app.models.profile import Profile
 from app.repositories.user_repository import UserRepository
-from app.core.security import hash_password, verify_password
+from app.core.security import hash_password, verify_password, create_access_token
 
 class AuthService:
     @staticmethod
@@ -51,15 +51,15 @@ class AuthService:
         }
     @staticmethod
     def login_user(db: Session, user_data: UserLoginRequest):
-
-        user = db.query(User).filter(
-            User.edu_email == user_data.edu_email
+        # Search by email or roll
+        user = db.query(User).outerjoin(Profile).filter(
+            (User.edu_email == user_data.login_id) | (Profile.roll == user_data.login_id)
         ).first()
 
         if not user:
             raise HTTPException(
                 status_code=401,
-                detail="Invalid email or password"
+                detail="Invalid credentials"
             )
 
         if not verify_password(
@@ -68,7 +68,7 @@ class AuthService:
         ):
             raise HTTPException(
                 status_code=401,
-                detail="Invalid email or password"
+                detail="Invalid credentials"
             )
 
         if not user.is_active:
@@ -76,10 +76,14 @@ class AuthService:
                 status_code=403,
                 detail="User account is inactive"
             )
+            
+        access_token = create_access_token(data={"sub": str(user.id)})
 
         return {
             "message": "Login successful",
+            "access_token": access_token,
+            "token_type": "bearer",
             "user_id": user.id,
             "edu_email": user.edu_email,
-            "full_name": user.profile.full_name
+            "full_name": user.profile.full_name if user.profile else None
         }

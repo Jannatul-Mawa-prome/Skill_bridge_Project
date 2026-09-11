@@ -1,7 +1,8 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from app.core.config import settings
+
 
 DATABASE_URL = (
     f"postgresql+psycopg://"
@@ -12,6 +13,7 @@ DATABASE_URL = (
     f"{settings.database_name}"
 )
 
+
 engine = create_engine(
     DATABASE_URL,
     echo=True
@@ -20,3 +22,10 @@ engine = create_engine(
 
 class Base(DeclarativeBase):
     pass
+
+
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine
+)

@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.auth import router as auth_router
+from app.api.v1.roadmap import router as roadmap_router
+from app.api.v1.community import router as community_router
 
 app = FastAPI(
     title="SkillBridge API",
@@ -17,7 +19,8 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
-
+app.include_router(community_router)
+app.include_router(roadmap_router)
 
 @app.get("/")
 def root():
