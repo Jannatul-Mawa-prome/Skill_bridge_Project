@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
-                            edu_email: email,
+                            login_id: email,
                             password: password
                         })
                     }
@@ -38,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 // Successful login
+                localStorage.setItem("access_token", data.access_token);
                 localStorage.setItem("user_id", data.user_id);
                 localStorage.setItem("edu_email", data.edu_email);
                 localStorage.setItem("full_name", data.full_name);

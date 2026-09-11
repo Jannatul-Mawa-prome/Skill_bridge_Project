@@ -1081,20 +1081,56 @@
 
     document
         .getElementById("joinForm")
-        .addEventListener("submit", (event) => {
-
+        .addEventListener("submit", async (event) => {
             event.preventDefault();
 
-            /*
-                Backend integration will be added later.
+            const token = localStorage.getItem("access_token");
+            if (!token) {
+                alert("Please log in first to join the community.");
+                window.location.href = "login.html";
+                return;
+            }
 
-                For now, after completing the assessment,
-                redirect to the Programming Community Dashboard.
-            */
+            const formData = new FormData(event.target);
+            
+            // Extract values matching backend schema
+            const skillLevel = formData.get("level") || "beginner";
+            const languages = formData.getAll("language");
+            const problemSolving = formData.get("problem") || "new";
+            const goal = formData.get("goal") || "learn";
+            const timeCommitment = formData.get("time") || "2-5 hours";
 
-            window.location.href =
-                "programming_dashboard.html";
+            const data = {
+                skill_level: skillLevel,
+                languages_known: languages.length > 0 ? languages : ["None"],
+                problem_solving_comfort: problemSolving,
+                main_goal: goal,
+                weekly_time_commitment: timeCommitment
+            };
 
+            const urlParams = new URLSearchParams(window.location.search);
+            const communityId = urlParams.get('id') || 1;
+
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/v1/communities/${communityId}/join`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    window.location.href = `programming_dashboard.html?id=${communityId}`;
+                } else {
+                    const result = await response.json();
+                    alert(result.detail || "Failed to join community.");
+                }
+            } catch (error) {
+                console.error("Error joining community:", error);
+                alert("Server error.");
+            }
         });
 
 
