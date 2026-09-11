@@ -1,0 +1,483 @@
+/* =========================
+   ROADMAP PAGE
+========================= */
+
+.roadmap-page {
+    min-height: 100vh;
+    padding: 40px 7%;
+    background: #f8fafc;
+}
+
+
+/* =========================
+   TOP BAR
+========================= */
+
+.top-bar {
+    margin-bottom: 35px;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    text-decoration: none;
+    color: #475569;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    transition: 0.3s;
+}
+
+.back-btn:hover {
+    color: #2563eb;
+}
+
+.back-icon {
+    font-size: 22px;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.roadmap-header {
+    text-align: center;
+    max-width: 750px;
+    margin: 0 auto 55px;
+}
+
+.header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 8px 16px;
+
+    border-radius: 30px;
+
+    background: #eff6ff;
+    color: #2563eb;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    margin-bottom: 18px;
+}
+
+.roadmap-header h1 {
+    font-size: 46px;
+    margin: 0 0 15px;
+    color: #0f172a;
+}
+
+.roadmap-header h1 span {
+    color: #2563eb;
+}
+
+.roadmap-header p {
+    font-size: 17px;
+    line-height: 1.7;
+    color: #64748b;
+}
+
+
+/* =========================
+   SECTION
+========================= */
+
+.communities-section {
+    max-width: 1200px;
+    margin: auto;
+}
+
+.section-title {
+    margin-bottom: 25px;
+}
+
+.section-title h2 {
+    margin: 0;
+    font-size: 28px;
+    color: #0f172a;
+}
+
+.section-title p {
+    margin-top: 7px;
+    color: #64748b;
+}
+
+
+/* =========================
+   COMMUNITY GRID
+========================= */
+
+.community-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(330px, 1fr));
+
+    gap: 28px;
+}
+
+
+/* =========================
+   COMMUNITY CARD
+========================= */
+
+.community-card {
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 20px;
+
+    padding: 26px;
+
+    box-shadow:
+        0 8px 25px rgba(15, 23, 42, 0.06);
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease,
+        border-color 0.3s ease;
+}
+
+.community-card:hover {
+    transform: translateY(-6px);
+
+    border-color: #bfdbfe;
+
+    box-shadow:
+        0 18px 40px rgba(37, 99, 235, 0.12);
+}
+
+
+/* =========================
+   CARD TOP
+========================= */
+
+.card-top {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 24px;
+}
+
+.community-icon {
+    width: 58px;
+    height: 58px;
+
+    border-radius: 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 25px;
+
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.arrow-icon {
+    width: 38px;
+    height: 38px;
+
+    border-radius: 50%;
+
+    background: #f1f5f9;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #64748b;
+
+    font-size: 20px;
+
+    transition: 0.3s;
+}
+
+.community-card:hover .arrow-icon {
+    background: #2563eb;
+    color: white;
+}
+
+
+/* =========================
+   CARD CONTENT
+========================= */
+
+.community-card h3 {
+    margin: 0 0 12px;
+
+    font-size: 23px;
+
+    color: #0f172a;
+}
+
+.community-card-description {
+    color: #64748b;
+
+    font-size: 15px;
+
+    line-height: 1.7;
+
+    min-height: 75px;
+
+    margin-bottom: 20px;
+}
+
+
+/* =========================
+   TOPICS
+========================= */
+
+.topics {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin-bottom: 24px;
+}
+
+.topics span {
+    padding: 6px 11px;
+
+    background: #f1f5f9;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+
+    color: #475569;
+
+    font-weight: 600;
+}
+
+
+/* =========================
+   COMMUNITY STATS
+========================= */
+
+.community-stats {
+    display: flex;
+
+    gap: 35px;
+
+    padding: 18px 0;
+
+    border-top: 1px solid #e2e8f0;
+
+    border-bottom: 1px solid #e2e8f0;
+
+    margin-bottom: 20px;
+}
+
+.stat {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+.stat > i {
+    color: #2563eb;
+
+    font-size: 18px;
+}
+
+.stat strong {
+    display: block;
+
+    color: #0f172a;
+
+    font-size: 15px;
+}
+
+.stat small {
+    display: block;
+
+    color: #94a3b8;
+
+    font-size: 12px;
+}
+
+
+/* =========================
+   CONTINUE BUTTON
+========================= */
+
+.continue-btn {
+    width: 100%;
+
+    border: none;
+
+    padding: 13px 18px;
+
+    border-radius: 10px;
+
+    background: #2563eb;
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    transition: 0.3s;
+}
+
+.continue-btn:hover {
+    background: #1d4ed8;
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================
+   LOADING
+========================= */
+
+.loading-container {
+    grid-column: 1 / -1;
+
+    text-align: center;
+
+    padding: 70px 20px;
+
+    color: #64748b;
+}
+
+.loader {
+    width: 38px;
+    height: 38px;
+
+    border: 4px solid #e2e8f0;
+
+    border-top-color: #2563eb;
+
+    border-radius: 50%;
+
+    margin: 0 auto 15px;
+
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* =========================
+   NO COMMUNITY
+========================= */
+
+.no-community {
+    grid-column: 1 / -1;
+
+    text-align: center;
+
+    padding: 60px 20px;
+
+    background: white;
+
+    border-radius: 20px;
+
+    border: 1px solid #e2e8f0;
+}
+
+.no-community-icon {
+    font-size: 45px;
+
+    margin-bottom: 15px;
+}
+
+.no-community h3 {
+    color: #0f172a;
+}
+
+.no-community p {
+    color: #64748b;
+}
+
+
+/* =========================
+   NOTE
+========================= */
+
+.roadmap-note {
+    max-width: 900px;
+
+    margin: 45px auto 0;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 16px 20px;
+
+    background: #eff6ff;
+
+    border-radius: 12px;
+
+    color: #475569;
+}
+
+.note-icon {
+    font-size: 20px;
+}
+
+.roadmap-note p {
+    margin: 0;
+
+    font-size: 14px;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 700px) {
+
+    .roadmap-page {
+        padding: 25px 5%;
+    }
+
+    .roadmap-header h1 {
+        font-size: 34px;
+    }
+
+    .community-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .community-stats {
+        gap: 20px;
+    }
+
+}

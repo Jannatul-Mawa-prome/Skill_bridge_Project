@@ -1,14 +1,29 @@
+// ============================================
+// MOBILE MENU
+// ============================================
+
 document.addEventListener("DOMContentLoaded", () => {
-    const mobileMenu = document.getElementById('mobileMenu');
-    const navLinks = document.getElementById('navLinks');
+
+    const mobileMenu = document.getElementById("mobileMenu");
+    const navLinks = document.getElementById("navLinks");
 
     if (mobileMenu && navLinks) {
-        mobileMenu.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            mobileMenu.classList.toggle('open');
+
+        mobileMenu.addEventListener("click", () => {
+
+            navLinks.classList.toggle("active");
+            mobileMenu.classList.toggle("open");
+
         });
+
     }
+
 });
+
+
+// ============================================
+// USER MENU + LOGOUT
+// ============================================
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -22,34 +37,127 @@ document.addEventListener("DOMContentLoaded", () => {
     const userMenuBtn = document.getElementById("userMenuBtn");
     const logoutBtn = document.getElementById("logoutBtn");
 
-    // If user is logged in
+
+    // ========================================
+    // USER IS LOGGED IN
+    // ========================================
+
     if (fullName) {
 
-        loginBtn.style.display = "none";
-        signupBtn.style.display = "none";
+        if (loginBtn) {
+            loginBtn.style.display = "none";
+        }
 
-        userMenu.style.display = "block";
-        userName.textContent = fullName;
+        if (signupBtn) {
+            signupBtn.style.display = "none";
+        }
 
-        // Open / close dropdown
-        userMenuBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            userMenu.classList.toggle("active");
-        });
+        if (userMenu) {
+            userMenu.style.display = "block";
+        }
 
-        // Close dropdown when clicking outside
+        if (userName) {
+            userName.textContent = fullName;
+        }
+
+
+        // ====================================
+        // OPEN / CLOSE USER DROPDOWN
+        // ====================================
+
+        if (userMenuBtn) {
+
+            userMenuBtn.addEventListener("click", (e) => {
+
+                e.stopPropagation();
+
+                userMenu.classList.toggle("active");
+
+            });
+
+        }
+
+
+        // ====================================
+        // CLOSE DROPDOWN WHEN CLICKING OUTSIDE
+        // ====================================
+
         document.addEventListener("click", () => {
-            userMenu.classList.remove("active");
+
+            if (userMenu) {
+                userMenu.classList.remove("active");
+            }
+
         });
 
-        // Logout
-        logoutBtn.addEventListener("click", () => {
 
-            localStorage.removeItem("user_id");
-            localStorage.removeItem("edu_email");
-            localStorage.removeItem("full_name");
+        // ====================================
+        // LOGOUT
+        // ====================================
 
-            window.location.href = "index.html";
-        });
+        if (logoutBtn) {
+
+            logoutBtn.addEventListener("click", () => {
+
+                localStorage.removeItem("access_token");
+                localStorage.removeItem("user_id");
+                localStorage.removeItem("edu_email");
+                localStorage.removeItem("full_name");
+
+                window.location.href = "index.html";
+
+            });
+
+        }
+
     }
+
+});
+
+
+// ============================================
+// ROADMAP NAVIGATION
+// ============================================
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const roadmapLink = document.getElementById("roadmapLink");
+
+    if (!roadmapLink) {
+        return;
+    }
+
+
+    roadmapLink.addEventListener("click", (e) => {
+
+        e.preventDefault();
+
+
+        // =====================================
+        // CHECK LOGIN
+        // =====================================
+
+        const token = localStorage.getItem("access_token");
+
+
+        // =====================================
+        // NOT LOGGED IN
+        // =====================================
+
+        if (!token) {
+
+            window.location.href = "login.html";
+
+            return;
+        }
+
+
+        // =====================================
+        // LOGGED IN
+        // =====================================
+
+        window.location.href = "roadmap.html";
+
+    });
+
 });
