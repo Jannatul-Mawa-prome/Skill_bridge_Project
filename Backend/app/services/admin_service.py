@@ -1,22 +1,32 @@
+from datetime import datetime
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.security import hash_password
 from app.models.announcement import Announcement
+from app.models.challenge import Challenge
 from app.models.community import Community, CommunityMembership
+from app.models.event import Event
 from app.models.profile import Profile
 from app.models.resource import Resource
 from app.models.roadmap import Module, Roadmap, Task
 from app.models.user import User
 from app.repositories.admin_repository import AdminRepository
 from app.schemas.admin import (
+    AdminJoinRequestAnswer,
+    AdminJoinRequestResponse,
+    AdminMembershipResponse,
     AdminUserCreate,
     AdminUserUpdate,
     AnnouncementCreate,
     AnnouncementUpdate,
+    ChallengeCreate,
+    ChallengeUpdate,
     CommunityCreate,
     CommunityUpdate,
+    EventCreate,
+    EventUpdate,
     MembershipCreate,
     MembershipUpdate,
     ModuleCreate,
@@ -58,11 +68,14 @@ class AdminService:
             "communities": self.repo.count(Community),
             "active_communities": self.repo.count(Community, Community.is_active.is_(True)),
             "memberships": self.repo.count(CommunityMembership),
+            "pending_join_requests": self.repo.count(CommunityMembership, CommunityMembership.status == "pending"),
             "roadmaps": self.repo.count(Roadmap),
             "modules": self.repo.count(Module),
             "tasks": self.repo.count(Task),
             "resources": self.repo.count(Resource),
             "announcements": self.repo.count(Announcement),
+            "challenges": self.repo.count(Challenge),
+            "events": self.repo.count(Event),
         }
 
     def users(self, search: str | None = None):
@@ -341,3 +354,149 @@ class AdminService:
 
     def delete_announcement(self, announcement_id: int) -> None:
         self._delete(self.announcement(announcement_id))
+
+    def join_requests(self, community_id: int | None = None) -> list[AdminJoinRequestResponse]:
+        requests = self.repo.list_join_requests(community_id=community_id, status="pending")
+        result = []
+        for req in requests:
+            answers = []
+            for ans in req.answers:
+                answers.append(
+                    AdminJoinRequestAnswer(
+                        question_id=ans.question_id,
+                        question_key=ans.question.question_key if ans.question else "",
+                        prompt=ans.question.prompt if ans.question else "",
+                        answer=ans.answer,
+                    )
+                )
+            result.append(
+                AdminJoinRequestResponse(
+                    membership_id=req.id,
+                    user_id=req.user_id,
+                    community_id=req.community_id,
+                    community_name=req.community.name if req.community else "",
+                    student_name=req.user.profile.full_name if req.user and req.user.profile else (req.user.edu_email if req.user else ""),
+                    student_email=req.user.edu_email if req.user else "",
+                    student_roll=req.user.profile.roll if req.user and req.user.profile else None,
+                    department=req.user.profile.department if req.user and req.user.profile else None,
+                    semester=req.user.profile.semester if req.user and req.user.profile else None,
+                    mobile=req.user.profile.mobile if req.user and req.user.profile else None,
+                    status=req.status,
+                    joined_at=req.joined_at,
+                    answers=answers,
+                )
+            )
+        return result
+
+    def approve_join_request(self, membership_id: int, current_admin: User) -> AdminMembershipResponse:
+        membership = self.repo.get_join_request(membership_id)
+        if not membership:
+            raise HTTPException(status_code=404, detail="Join request not found")
+
+        if membership.status == "approved":
+            return AdminMembershipResponse.model_validate(membership)
+
+        membership.status = "approved"
+        membership.is_active = True
+        membership.reviewed_at = datetime.utcnow()
+        membership.reviewer_id = current_admin.id
+
+        community = self.repo.get_community(membership.community_id)
+        if community:
+            community.active_members_count += 1
+            self.repo.save(community)
+
+        saved = self._save(membership)
+        return AdminMembershipResponse.model_validate(saved)
+
+    def reject_join_request(self, membership_id: int, current_admin: User) -> AdminMembershipResponse:
+        membership = self.repo.get_join_request(membership_id)
+        if not membership:
+            raise HTTPException(status_code=404, detail="Join request not found")
+
+        was_approved = (membership.status == "approved")
+        membership.status = "rejected"
+        membership.is_active = False
+        membership.reviewed_at = datetime.utcnow()
+        membership.reviewer_id = current_admin.id
+
+        if was_approved:
+            community = self.repo.get_community(membership.community_id)
+            if community and community.active_members_count > 0:
+                community.active_members_count -= 1
+                self.repo.save(community)
+
+        saved = self._save(membership)
+        return AdminMembershipResponse.model_validate(saved)
+
+    def challenges(self, community_id: int | None = None) -> list[Challenge]:
+        if community_id is not None:
+            self.community(community_id)
+        return self.repo.list_challenges(community_id)
+
+    def challenge(self, challenge_id: int) -> Challenge:
+        item = self.repo.get_challenge(challenge_id)
+        if not item:
+            raise HTTPException(status_code=404, detail="Challenge not found")
+        return item
+
+    def create_challenge(self, data: ChallengeCreate) -> Challenge:
+        self.community(data.community_id)
+        return self._save(
+            Challenge(
+                community_id=data.community_id,
+                title=data.title,
+                description=data.description,
+                difficulty=data.difficulty,
+                xp_reward=data.xp_reward,
+                deadline=data.deadline,
+                is_active=data.is_active,
+            )
+        )
+
+    def update_challenge(self, challenge_id: int, data: ChallengeUpdate) -> Challenge:
+        item = self.challenge(challenge_id)
+        values = data.model_dump(exclude_unset=True)
+        if "community_id" in values:
+            self.community(values["community_id"])
+        for key, value in values.items():
+            setattr(item, key, value)
+        return self._save(item)
+
+    def delete_challenge(self, challenge_id: int) -> None:
+        self._delete(self.challenge(challenge_id))
+
+    def events(self, community_id: int | None = None) -> list[Event]:
+        if community_id is not None:
+            self.community(community_id)
+        return self.repo.list_events(community_id)
+
+    def event(self, event_id: int) -> Event:
+        item = self.repo.get_event(event_id)
+        if not item:
+            raise HTTPException(status_code=404, detail="Event not found")
+        return item
+
+    def create_event(self, data: EventCreate) -> Event:
+        self.community(data.community_id)
+        return self._save(
+            Event(
+                community_id=data.community_id,
+                title=data.title,
+                description=data.description,
+                event_date=data.event_date,
+                status=data.status,
+            )
+        )
+
+    def update_event(self, event_id: int, data: EventUpdate) -> Event:
+        item = self.event(event_id)
+        values = data.model_dump(exclude_unset=True)
+        if "community_id" in values:
+            self.community(values["community_id"])
+        for key, value in values.items():
+            setattr(item, key, value)
+        return self._save(item)
+
+    def delete_event(self, event_id: int) -> None:
+        self._delete(self.event(event_id))

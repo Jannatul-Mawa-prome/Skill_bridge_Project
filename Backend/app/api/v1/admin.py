@@ -6,7 +6,10 @@ from app.database.session import get_db
 from app.models.user import User
 from app.schemas.admin import (
     AdminAnnouncementResponse,
+    AdminChallengeResponse,
     AdminCommunityResponse,
+    AdminEventResponse,
+    AdminJoinRequestResponse,
     AdminMembershipResponse,
     AdminModuleResponse,
     AdminOverviewResponse,
@@ -18,9 +21,13 @@ from app.schemas.admin import (
     AdminUserUpdate,
     AnnouncementCreate,
     AnnouncementUpdate,
+    ChallengeCreate,
+    ChallengeUpdate,
     CommunityCreate,
     CommunityStatusUpdate,
     CommunityUpdate,
+    EventCreate,
+    EventUpdate,
     MembershipCreate,
     MembershipStatusUpdate,
     MembershipUpdate,
@@ -332,4 +339,116 @@ def update_announcement(
 @router.delete("/announcements/{announcement_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_announcement(announcement_id: int, db: Session = Depends(get_db)):
     service(db).delete_announcement(announcement_id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+# =========================
+# JOIN REQUESTS
+# =========================
+
+@router.get("/join-requests", response_model=list[AdminJoinRequestResponse])
+def list_join_requests(
+    community_id: int | None = Query(default=None),
+    db: Session = Depends(get_db),
+):
+    return service(db).join_requests(community_id)
+
+
+@router.post("/join-requests/{membership_id}/approve", response_model=AdminMembershipResponse)
+def approve_join_request(
+    membership_id: int,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin),
+):
+    return service(db).approve_join_request(membership_id, current_admin)
+
+
+@router.post("/join-requests/{membership_id}/reject", response_model=AdminMembershipResponse)
+def reject_join_request(
+    membership_id: int,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin),
+):
+    return service(db).reject_join_request(membership_id, current_admin)
+
+
+# =========================
+# CHALLENGES
+# =========================
+
+@router.get("/challenges", response_model=list[AdminChallengeResponse])
+def list_challenges(
+    community_id: int | None = Query(default=None),
+    db: Session = Depends(get_db),
+):
+    return service(db).challenges(community_id)
+
+
+@router.post("/challenges", response_model=AdminChallengeResponse, status_code=status.HTTP_201_CREATED)
+def create_challenge(
+    data: ChallengeCreate,
+    db: Session = Depends(get_db),
+):
+    return service(db).create_challenge(data)
+
+
+@router.get("/challenges/{challenge_id}", response_model=AdminChallengeResponse)
+def get_challenge(challenge_id: int, db: Session = Depends(get_db)):
+    return service(db).challenge(challenge_id)
+
+
+@router.put("/challenges/{challenge_id}", response_model=AdminChallengeResponse)
+@router.patch("/challenges/{challenge_id}", response_model=AdminChallengeResponse)
+def update_challenge(
+    challenge_id: int,
+    data: ChallengeUpdate,
+    db: Session = Depends(get_db),
+):
+    return service(db).update_challenge(challenge_id, data)
+
+
+@router.delete("/challenges/{challenge_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_challenge(challenge_id: int, db: Session = Depends(get_db)):
+    service(db).delete_challenge(challenge_id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+# =========================
+# EVENTS
+# =========================
+
+@router.get("/events", response_model=list[AdminEventResponse])
+def list_events(
+    community_id: int | None = Query(default=None),
+    db: Session = Depends(get_db),
+):
+    return service(db).events(community_id)
+
+
+@router.post("/events", response_model=AdminEventResponse, status_code=status.HTTP_201_CREATED)
+def create_event(
+    data: EventCreate,
+    db: Session = Depends(get_db),
+):
+    return service(db).create_event(data)
+
+
+@router.get("/events/{event_id}", response_model=AdminEventResponse)
+def get_event(event_id: int, db: Session = Depends(get_db)):
+    return service(db).event(event_id)
+
+
+@router.put("/events/{event_id}", response_model=AdminEventResponse)
+@router.patch("/events/{event_id}", response_model=AdminEventResponse)
+def update_event(
+    event_id: int,
+    data: EventUpdate,
+    db: Session = Depends(get_db),
+):
+    return service(db).update_event(event_id, data)
+
+
+@router.delete("/events/{event_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_event(event_id: int, db: Session = Depends(get_db)):
+    service(db).delete_event(event_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

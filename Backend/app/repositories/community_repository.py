@@ -45,34 +45,74 @@ class CommunityRepository:
         ).all()
         return [(question_key, answer) for answer, question_key in rows]
 
+    def get_user_memberships(self, user_id: int, status: str | None = None) -> list[CommunityMembership]:
+        query = select(CommunityMembership).where(CommunityMembership.user_id == user_id)
+        if status:
+            query = query.where(CommunityMembership.status == status)
+        return self.db.execute(query).scalars().all()
+
     def create_membership(
         self,
         user_id: int,
         community_id: int,
         assessment_data: JoinCommunityRequest,
         answers: list[tuple[CommunityQuestion, object]] | None = None,
+        status: str = "pending",
     ) -> CommunityMembership:
-        # Create membership
-        membership = CommunityMembership(user_id=user_id, community_id=community_id)
-        self.db.add(membership)
-        self.db.flush() # To get membership.id
+        # Create or update existing membership
+        membership = self.get_membership(user_id, community_id)
+        if not membership:
+            membership = CommunityMembership(
+                user_id=user_id,
+                community_id=community_id,
+                status=status,
+                is_active=(status == "approved"),
+            )
+            self.db.add(membership)
+            self.db.flush()
+        else:
+            membership.status = status
+            membership.is_active = (status == "approved")
+            self.db.add(membership)
+            self.db.flush()
 
-        # Update community active members
-        community = self.get_community_by_id(community_id)
-        if community:
-            community.active_members_count += 1
-            self.db.add(community)
+        # Update community active members only if approved
+        if status == "approved":
+            community = self.get_community_by_id(community_id)
+            if community:
+                community.active_members_count += 1
+                self.db.add(community)
 
-        # Create assessment data
-        assessment = AssessmentData(
-            membership_id=membership.id,
-            skill_level=assessment_data.skill_level,
-            languages_known=",".join(assessment_data.languages_known),
-            problem_solving_comfort=assessment_data.problem_solving_comfort,
-            main_goal=assessment_data.main_goal,
-            weekly_time_commitment=assessment_data.weekly_time_commitment
-        )
-        self.db.add(assessment)
+        # Create or update assessment data
+        assessment = self.db.execute(
+            select(AssessmentData).where(AssessmentData.membership_id == membership.id)
+        ).scalar_one_or_none()
+
+        if not assessment:
+            assessment = AssessmentData(
+                membership_id=membership.id,
+                skill_level=assessment_data.skill_level,
+                languages_known=",".join(assessment_data.languages_known) if assessment_data.languages_known else None,
+                problem_solving_comfort=assessment_data.problem_solving_comfort,
+                main_goal=assessment_data.main_goal,
+                weekly_time_commitment=assessment_data.weekly_time_commitment
+            )
+            self.db.add(assessment)
+        else:
+            assessment.skill_level = assessment_data.skill_level
+            if assessment_data.languages_known:
+                assessment.languages_known = ",".join(assessment_data.languages_known)
+            assessment.problem_solving_comfort = assessment_data.problem_solving_comfort
+            assessment.main_goal = assessment_data.main_goal
+            assessment.weekly_time_commitment = assessment_data.weekly_time_commitment
+            self.db.add(assessment)
+
+        # Delete previous answers if re-applying
+        existing_answers = self.db.execute(
+            select(CommunityAnswer).where(CommunityAnswer.membership_id == membership.id)
+        ).scalars().all()
+        for ans in existing_answers:
+            self.db.delete(ans)
 
         for question, answer in answers or []:
             self.db.add(

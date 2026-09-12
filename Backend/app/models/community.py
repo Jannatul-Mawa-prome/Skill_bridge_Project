@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 if TYPE_CHECKING:
     from app.models.roadmap import Roadmap
     from app.models.community_question import CommunityQuestion
+    from app.models.community_answer import CommunityAnswer
     
 class Community(Base):
     __tablename__ = "communities"
@@ -57,12 +58,20 @@ class CommunityMembership(Base):
     community_id: Mapped[int] = mapped_column(ForeignKey("communities.id", ondelete="CASCADE"), index=True)
     
     role: Mapped[str] = mapped_column(String(50), default="member")
+    status: Mapped[str] = mapped_column(String(50), default="pending", nullable=False)
     streak: Mapped[int] = mapped_column(Integer, default=0)
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     joined_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    reviewer_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
 
-    user: Mapped["User"] = relationship()
+    user: Mapped["User"] = relationship(foreign_keys=[user_id])
+    reviewer: Mapped["User | None"] = relationship(foreign_keys=[reviewer_id])
     community: Mapped["Community"] = relationship(back_populates="memberships")
+    answers: Mapped[List["CommunityAnswer"]] = relationship(
+        back_populates="membership",
+        cascade="all, delete-orphan",
+    )
     assessment: Mapped["AssessmentData"] = relationship(
         back_populates="membership", uselist=False, cascade="all, delete-orphan"
     )

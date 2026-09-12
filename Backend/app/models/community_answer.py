@@ -45,5 +45,5 @@ class CommunityAnswer(Base):
         nullable=False,
     )
 
-    membership: Mapped["CommunityMembership"] = relationship()
+    membership: Mapped["CommunityMembership"] = relationship(back_populates="answers")
     question: Mapped["CommunityQuestion"] = relationship()

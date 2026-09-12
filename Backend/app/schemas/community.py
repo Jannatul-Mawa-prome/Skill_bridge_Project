@@ -40,8 +40,14 @@ class DashboardCommunityResponse(BaseModel):
 class DashboardMembershipResponse(BaseModel):
     id: int
     role: str
+    status: str
     streak: int
     joined_at: datetime
+
+class MembershipStatusResponse(BaseModel):
+    is_member: bool
+    status: str
+    membership_id: Optional[int] = None
 
 class DashboardAnswerResponse(BaseModel):
     question_key: str

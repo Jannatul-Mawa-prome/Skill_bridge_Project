@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
@@ -114,9 +115,12 @@ class AdminMembershipResponse(BaseModel):
     user_id: int
     community_id: int
     role: str
+    status: str = "approved"
     streak: int
     is_active: bool
     joined_at: datetime
+    reviewed_at: datetime | None = None
+    reviewer_id: int | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -248,8 +252,96 @@ class AdminOverviewResponse(BaseModel):
     communities: int
     active_communities: int
     memberships: int
+    pending_join_requests: int = 0
     roadmaps: int
     modules: int
     tasks: int
     resources: int
     announcements: int
+    challenges: int = 0
+    events: int = 0
+
+
+class AdminJoinRequestAnswer(BaseModel):
+    question_id: int
+    question_key: str
+    prompt: str
+    answer: Any
+
+
+class AdminJoinRequestResponse(BaseModel):
+    membership_id: int
+    user_id: int
+    community_id: int
+    community_name: str
+    student_name: str
+    student_email: str
+    student_roll: str | None = None
+    department: str | None = None
+    semester: str | None = None
+    mobile: str | None = None
+    status: str
+    joined_at: datetime
+    answers: list[AdminJoinRequestAnswer] = []
+
+
+class ChallengeCreate(BaseModel):
+    community_id: int
+    title: str = Field(..., min_length=1, max_length=200)
+    description: str | None = None
+    difficulty: str = Field(default="easy", max_length=50)
+    xp_reward: int = Field(default=0, ge=0)
+    deadline: datetime | None = None
+    is_active: bool = True
+
+
+class ChallengeUpdate(BaseModel):
+    community_id: int | None = None
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = None
+    difficulty: str | None = Field(default=None, max_length=50)
+    xp_reward: int | None = Field(default=None, ge=0)
+    deadline: datetime | None = None
+    is_active: bool | None = None
+
+
+class AdminChallengeResponse(BaseModel):
+    id: int
+    community_id: int
+    title: str
+    description: str | None = None
+    difficulty: str
+    xp_reward: int
+    is_active: bool
+    deadline: datetime | None = None
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class EventCreate(BaseModel):
+    community_id: int
+    title: str = Field(..., min_length=1, max_length=200)
+    description: str | None = None
+    event_date: datetime
+    status: str = Field(default="upcoming", max_length=50)
+
+
+class EventUpdate(BaseModel):
+    community_id: int | None = None
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = None
+    event_date: datetime | None = None
+    status: str | None = Field(default=None, max_length=50)
+
+
+class AdminEventResponse(BaseModel):
+    id: int
+    community_id: int
+    title: str
+    description: str | None = None
+    event_date: datetime
+    status: str
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)

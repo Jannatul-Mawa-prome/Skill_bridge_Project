@@ -1,8 +1,12 @@
 from sqlalchemy import func, select
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session, joinedload, selectinload
 
 from app.models.announcement import Announcement
+from app.models.challenge import Challenge
 from app.models.community import Community, CommunityMembership
+from app.models.community_answer import CommunityAnswer
+from app.models.community_question import CommunityQuestion
+from app.models.event import Event
 from app.models.resource import Resource
 from app.models.roadmap import Module, Roadmap, Task
 from app.models.profile import Profile
@@ -101,6 +105,52 @@ class AdminRepository:
 
     def get_announcement(self, announcement_id: int) -> Announcement | None:
         return self.db.get(Announcement, announcement_id)
+
+    def list_challenges(self, community_id: int | None = None) -> list[Challenge]:
+        query = select(Challenge).order_by(Challenge.id.desc())
+        if community_id is not None:
+            query = query.where(Challenge.community_id == community_id)
+        return list(self.db.execute(query).scalars().all())
+
+    def get_challenge(self, challenge_id: int) -> Challenge | None:
+        return self.db.get(Challenge, challenge_id)
+
+    def list_events(self, community_id: int | None = None) -> list[Event]:
+        query = select(Event).order_by(Event.event_date.asc(), Event.id.desc())
+        if community_id is not None:
+            query = query.where(Event.community_id == community_id)
+        return list(self.db.execute(query).scalars().all())
+
+    def get_event(self, event_id: int) -> Event | None:
+        return self.db.get(Event, event_id)
+
+    def list_join_requests(
+        self, community_id: int | None = None, status: str = "pending"
+    ) -> list[CommunityMembership]:
+        query = (
+            select(CommunityMembership)
+            .options(
+                joinedload(CommunityMembership.user).joinedload(User.profile),
+                joinedload(CommunityMembership.community),
+                selectinload(CommunityMembership.answers).joinedload(CommunityAnswer.question),
+            )
+            .where(CommunityMembership.status == status)
+            .order_by(CommunityMembership.joined_at.desc())
+        )
+        if community_id is not None:
+            query = query.where(CommunityMembership.community_id == community_id)
+        return list(self.db.execute(query).scalars().all())
+
+    def get_join_request(self, membership_id: int) -> CommunityMembership | None:
+        return self.db.execute(
+            select(CommunityMembership)
+            .options(
+                joinedload(CommunityMembership.user).joinedload(User.profile),
+                joinedload(CommunityMembership.community),
+                selectinload(CommunityMembership.answers).joinedload(CommunityAnswer.question),
+            )
+            .where(CommunityMembership.id == membership_id)
+        ).scalar_one_or_none()
 
     def count(self, model, *conditions) -> int:
         query = select(func.count()).select_from(model)

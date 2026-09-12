@@ -102,10 +102,16 @@ class CommunityService:
         )
 
         if existing_membership:
-            raise HTTPException(
-                status_code=400,
-                detail="User already joined this community"
-            )
+            if existing_membership.status == "approved":
+                raise HTTPException(
+                    status_code=400,
+                    detail="You are already an approved member of this community."
+                )
+            elif existing_membership.status == "pending":
+                raise HTTPException(
+                    status_code=400,
+                    detail="Your join request is already pending administrator approval."
+                )
 
         questions = self.question_repo.get_active_questions(community_id)
         answer_pairs = self._validate_join_answers(questions, request)
@@ -114,12 +120,14 @@ class CommunityService:
             community_id,
             request,
             answer_pairs,
+            status="pending",
         )
 
         return {
-            "message": "Successfully joined community",
+            "message": "Join request submitted successfully. Pending administrator approval.",
             "membership_id": membership.id,
-            "community_id": community_id
+            "community_id": community_id,
+            "status": "pending"
         }
 
     def _validate_join_answers(
@@ -227,7 +235,9 @@ class CommunityService:
         memberships = (
             self.db.query(CommunityMembership)
             .filter(
-                CommunityMembership.user_id == user_id
+                CommunityMembership.user_id == user_id,
+                CommunityMembership.status == "approved",
+                CommunityMembership.is_active == True,
             )
             .all()
         )
@@ -267,6 +277,24 @@ class CommunityService:
             raise HTTPException(
                 status_code=403,
                 detail="Not a member of this community"
+            )
+
+        if membership.status == "pending":
+            raise HTTPException(
+                status_code=403,
+                detail="Your membership request is pending administrator approval."
+            )
+
+        if membership.status == "rejected":
+            raise HTTPException(
+                status_code=403,
+                detail="Your membership request was rejected by the administrator."
+            )
+
+        if not membership.is_active:
+            raise HTTPException(
+                status_code=403,
+                detail="Your membership in this community is inactive."
             )
 
         answer_rows = self.community_repo.get_membership_answers(membership.id)
@@ -482,6 +510,7 @@ class CommunityService:
             membership=DashboardMembershipResponse(
                 id=membership.id,
                 role=membership.role,
+                status=membership.status,
                 streak=membership.streak,
                 joined_at=membership.joined_at,
             ),
@@ -525,5 +554,7 @@ class CommunityService:
         )
 
         return {
-            "is_member": membership is not None
+            "is_member": membership is not None and membership.status == "approved" and membership.is_active,
+            "status": membership.status if membership else "none",
+            "membership_id": membership.id if membership else None,
         }
