@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.models.user import User
 from app.repositories.community_content_repository import CommunityContentRepository
 from app.repositories.community_repository import CommunityRepository
+from app.schemas.community_content import DiscussionCreate
 
 
 class CommunityContentService:
@@ -52,6 +53,15 @@ class CommunityContentService:
     def get_discussions(self, user: User, community_id: int):
         self.require_membership(user, community_id)
         return self.content_repo.get_discussions(community_id)
+
+    def create_discussion(self, user: User, community_id: int, data: DiscussionCreate):
+        self.require_membership(user, community_id)
+        return self.content_repo.create_discussion(
+            community_id=community_id,
+            author_id=user.id,
+            title=data.title,
+            content=data.content,
+        )
 
     def get_announcements(self, user: User, community_id: int):
         self.require_membership(user, community_id)

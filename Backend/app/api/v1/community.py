@@ -15,6 +15,7 @@ from app.services.community_content_service import CommunityContentService
 from app.schemas.community_content import (
     AnnouncementResponse,
     ChallengeResponse,
+    DiscussionCreate,
     DiscussionResponse,
     EventResponse,
     ResourceResponse,
@@ -116,6 +117,23 @@ def get_discussions(
     current_user: User = Depends(get_current_user),
 ):
     return content_service(db).get_discussions(current_user, community_id)
+
+@router.post(
+    "/{community_id}/discussions",
+    response_model=DiscussionResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_discussion(
+    community_id: int,
+    discussion_data: DiscussionCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return content_service(db).create_discussion(
+        current_user,
+        community_id,
+        discussion_data,
+    )
 
 @router.get("/{community_id}/announcements", response_model=list[AnnouncementResponse])
 def get_announcements(

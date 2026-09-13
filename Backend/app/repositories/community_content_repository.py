@@ -78,6 +78,19 @@ class CommunityContentRepository:
             .order_by(Discussion.created_at.desc())
         ).scalars().all()
 
+    def create_discussion(self, community_id: int, author_id: int, title: str, content: str | None = None) -> Discussion:
+        discussion = Discussion(
+            community_id=community_id,
+            author_id=author_id,
+            title=title,
+            content=content,
+            reply_count=0,
+        )
+        self.db.add(discussion)
+        self.db.commit()
+        self.db.refresh(discussion)
+        return discussion
+
     def get_announcements(self, community_id: int) -> list[Announcement]:
         return self.db.execute(
             select(Announcement)

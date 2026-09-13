@@ -8,11 +8,10 @@ class RoadmapRepository:
         self.db = db
 
     def get_roadmap_by_community(self, community_id: int) -> Roadmap | None:
-        # Assuming one roadmap per community for now, or returning the main one.
-        # joinedload helps in avoiding N+1 queries when fetching modules and tasks
         return self.db.execute(
             select(Roadmap)
             .where(Roadmap.community_id == community_id)
+            .order_by(Roadmap.id.desc())
             .options(joinedload(Roadmap.modules).joinedload(Module.tasks))
         ).unique().scalars().first()
     

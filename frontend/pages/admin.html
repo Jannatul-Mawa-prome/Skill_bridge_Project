@@ -3,40 +3,590 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin | SkillBridge</title>
+    <title>Admin Control Center | SkillBridge</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="../css/admin.css">
 </head>
 <body>
     <aside class="admin-sidebar">
-        <a class="brand" href="admin.html">Skill<span>Bridge</span></a>
+        <a class="brand" href="admin.html">
+            <i class="fa-solid fa-book-open"></i>
+            Skill<span>Bridge</span>
+        </a>
         <nav>
-            <a href="#dashboard">Dashboard</a>
-            <a href="#users">Users</a>
-            <a href="#communities">Communities</a>
-            <a href="#memberships">Memberships</a>
-            <a href="#roadmaps">Roadmaps</a>
-            <a href="#resources">Resources</a>
-            <a href="#announcements">Announcements</a>
+            <a href="#dashboard" class="active"><i class="fa-solid fa-gauge"></i> Overview</a>
+            <a href="#communities"><i class="fa-solid fa-network-wired"></i> Communities</a>
+            <a href="#join-requests">
+                <span><i class="fa-solid fa-user-clock"></i> Join Requests</span>
+                <span id="pendingRequestsBadge" class="nav-badge" style="display:none;">0</span>
+            </a>
+            <a href="#roadmaps"><i class="fa-solid fa-map"></i> Roadmaps & Tasks</a>
+            <a href="#resources"><i class="fa-solid fa-folder-open"></i> Resources</a>
+            <a href="#announcements"><i class="fa-solid fa-bullhorn"></i> Announcements</a>
+            <a href="#challenges"><i class="fa-solid fa-trophy"></i> Challenges</a>
+            <a href="#events"><i class="fa-solid fa-calendar-days"></i> Events</a>
+            <a href="#memberships"><i class="fa-solid fa-id-card"></i> Memberships</a>
+            <a href="#users"><i class="fa-solid fa-users"></i> Users</a>
         </nav>
-        <button id="logoutButton">Sign out</button>
+        <button id="logoutButton"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign out</button>
     </aside>
+
     <main class="admin-main">
         <header class="admin-header">
-            <div><span class="eyebrow">ADMINISTRATION</span><h1>Platform control center</h1></div>
-            <span id="adminStatus" class="status">Checking access...</span>
+            <div>
+                <span class="eyebrow">Platform Administration</span>
+                <h1>SkillBridge Control Center</h1>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span id="adminStatus" class="status">Checking access...</span>
+                <a href="index.html" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> View Site</a>
+            </div>
         </header>
-        <p id="feedback" class="feedback" role="status"></p>
+
+        <div id="feedback" class="feedback" role="status"></div>
+
+        <!-- 1. DASHBOARD OVERVIEW -->
         <section id="dashboard" class="panel">
-            <div class="section-heading"><div><span class="eyebrow">OVERVIEW</span><h2>Platform health</h2></div><button class="secondary" data-refresh>Refresh</button></div>
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">OVERVIEW</span>
+                    <h2>Platform Health & Metrics</h2>
+                </div>
+                <button class="btn btn-secondary" data-refresh><i class="fa-solid fa-rotate"></i> Refresh Data</button>
+            </div>
             <div id="statsGrid" class="stats-grid"></div>
         </section>
-        <section id="users" class="panel"><div class="section-heading"><h2>Users</h2><input id="userSearch" placeholder="Search name, roll or email"></div><div class="table-wrap"><table><thead><tr><th>User</th><th>Profile</th><th>Status</th><th>Admin</th><th>Actions</th></tr></thead><tbody id="usersTable"></tbody></table></div></section>
-        <section id="communities" class="panel"><div class="section-heading"><h2>Communities</h2></div><div class="table-wrap"><table><thead><tr><th>Community</th><th>Members</th><th>Status</th><th>Actions</th></tr></thead><tbody id="communitiesTable"></tbody></table></div></section>
-        <section id="memberships" class="panel"><div class="section-heading"><h2>Memberships</h2></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>User</th><th>Community</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead><tbody id="membershipsTable"></tbody></table></div></section>
-        <section id="roadmaps" class="panel"><div class="section-heading"><h2>Roadmaps</h2></div><div class="table-wrap"><table><thead><tr><th>Title</th><th>Community</th><th>Modules</th><th>Actions</th></tr></thead><tbody id="roadmapsTable"></tbody></table></div></section>
-        <section id="resources" class="panel"><div class="section-heading"><h2>Resources</h2></div><div class="table-wrap"><table><thead><tr><th>Title</th><th>Type</th><th>Difficulty</th><th>Actions</th></tr></thead><tbody id="resourcesTable"></tbody></table></div></section>
-        <section id="announcements" class="panel"><div class="section-heading"><h2>Announcements</h2></div><div class="table-wrap"><table><thead><tr><th>Title</th><th>Community</th><th>Published</th><th>Actions</th></tr></thead><tbody id="announcementsTable"></tbody></table></div></section>
+
+        <!-- 2. COMMUNITIES -->
+        <section id="communities" class="panel">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">MANAGEMENT</span>
+                    <h2>Communities</h2>
+                </div>
+                <button class="btn btn-primary" id="openAddCommunityBtn"><i class="fa-solid fa-plus"></i> New Community</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Community Name & Description</th>
+                            <th>Active Members</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="communitiesTable"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 3. JOIN REQUESTS -->
+        <section id="join-requests" class="panel">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">APPROVALS</span>
+                    <h2>Pending Join Requests</h2>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Roll / Dept</th>
+                            <th>Community</th>
+                            <th>Questionnaire Answers</th>
+                            <th>Requested At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="joinRequestsTable"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 4. ROADMAPS & TASKS -->
+        <section id="roadmaps" class="panel">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">CURRICULUM</span>
+                    <h2>Roadmaps, Modules & Tasks</h2>
+                </div>
+                <button class="btn btn-primary" id="openAddRoadmapBtn"><i class="fa-solid fa-plus"></i> New Roadmap</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Roadmap Title</th>
+                            <th>Community</th>
+                            <th>Modules Count</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="roadmapsTable"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 5. RESOURCES -->
+        <section id="resources" class="panel">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">LEARNING MATERIALS</span>
+                    <h2>Recommended Resources</h2>
+                </div>
+                <button class="btn btn-primary" id="openAddResourceBtn"><i class="fa-solid fa-plus"></i> New Resource</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Resource Title</th>
+                            <th>Community</th>
+                            <th>Type</th>
+                            <th>Difficulty</th>
+                            <th>URL / Link</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resourcesTable"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 6. ANNOUNCEMENTS -->
+        <section id="announcements" class="panel">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">BROADCASTS</span>
+                    <h2>Announcements</h2>
+                </div>
+                <button class="btn btn-primary" id="openAddAnnouncementBtn"><i class="fa-solid fa-plus"></i> New Announcement</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title & Content</th>
+                            <th>Community</th>
+                            <th>Published</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="announcementsTable"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 7. CHALLENGES -->
+        <section id="challenges" class="panel">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">PRACTICE</span>
+                    <h2>Community Challenges</h2>
+                </div>
+                <button class="btn btn-primary" id="openAddChallengeBtn"><i class="fa-solid fa-plus"></i> New Challenge</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Challenge Title</th>
+                            <th>Community</th>
+                            <th>Difficulty</th>
+                            <th>Reward XP</th>
+                            <th>Deadline</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="challengesTable"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 8. EVENTS -->
+        <section id="events" class="panel">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">CALENDAR</span>
+                    <h2>Upcoming Events & Workshops</h2>
+                </div>
+                <button class="btn btn-primary" id="openAddEventBtn"><i class="fa-solid fa-plus"></i> New Event</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Event Title</th>
+                            <th>Community</th>
+                            <th>Date & Time</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eventsTable"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 9. MEMBERSHIPS -->
+        <section id="memberships" class="panel">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">COMMUNITY ACCESS</span>
+                    <h2>Enrolled Memberships</h2>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User ID</th>
+                            <th>Community ID</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Active</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="membershipsTable"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 10. USERS -->
+        <section id="users" class="panel">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">ACCOUNTS</span>
+                    <h2>Registered Users</h2>
+                </div>
+                <div class="heading-actions">
+                    <input id="userSearch" placeholder="Search name, roll or email..." style="width: 260px;">
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User & Email</th>
+                            <th>Academic Profile</th>
+                            <th>Active Status</th>
+                            <th>Is Admin</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTable"></tbody>
+                </table>
+            </div>
+        </section>
     </main>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- Modal: Add Community -->
+    <div id="communityModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="communityModalTitle">New Community</h3>
+                <button class="modal-close" data-close>&times;</button>
+            </div>
+            <form id="communityForm">
+                <div class="modal-body">
+                    <input type="hidden" id="communityEditId">
+                    <div class="form-group">
+                        <label for="communityName">Community Name *</label>
+                        <input type="text" id="communityName" required placeholder="e.g. Mobile App Development">
+                    </div>
+                    <div class="form-group">
+                        <label for="communityDescription">Description</label>
+                        <textarea id="communityDescription" rows="3" placeholder="Brief description of the community's learning goals..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-close>Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Community</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Add Roadmap -->
+    <div id="roadmapModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Create Roadmap</h3>
+                <button class="modal-close" data-close>&times;</button>
+            </div>
+            <form id="roadmapForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="roadmapCommunitySelect">Community *</label>
+                        <select id="roadmapCommunitySelect" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="roadmapTitle">Roadmap Title *</label>
+                        <input type="text" id="roadmapTitle" required placeholder="e.g. Full-Stack Web Development Roadmap">
+                    </div>
+                    <div class="form-group">
+                        <label for="roadmapDescription">Description</label>
+                        <textarea id="roadmapDescription" rows="3" placeholder="Overview of what students will accomplish..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-close>Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Roadmap</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Manage Modules & Tasks -->
+    <div id="manageModulesModal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 750px;">
+            <div class="modal-header">
+                <h3 id="manageModulesTitle">Manage Roadmap Modules & Tasks</h3>
+                <button class="modal-close" data-close>&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h4 style="font-size: 15px; color: var(--text-muted);">Curriculum Modules</h4>
+                    <button type="button" class="btn btn-primary action" id="openAddModuleBtn"><i class="fa-solid fa-plus"></i> Add Module</button>
+                </div>
+
+                <!-- Add Module Form (inline toggle) -->
+                <form id="addModuleForm" style="display: none; background: #f1f5f9; padding: 14px; border-radius: 8px; margin-bottom: 16px;">
+                    <h5 style="margin-bottom: 10px; font-weight: 700;">Add New Module</h5>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="moduleOrder">Order Number *</label>
+                            <input type="number" id="moduleOrder" required min="1" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="moduleTitle">Module Title *</label>
+                            <input type="text" id="moduleTitle" required placeholder="e.g. JavaScript Fundamentals">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="moduleDescription">Description</label>
+                        <input type="text" id="moduleDescription" placeholder="Brief summary of topics covered...">
+                    </div>
+                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                        <button type="button" class="btn btn-secondary" id="cancelModuleBtn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Module</button>
+                    </div>
+                </form>
+
+                <!-- Add Task Form (inline toggle) -->
+                <form id="addTaskForm" style="display: none; background: #e0f2fe; padding: 14px; border-radius: 8px; margin-bottom: 16px;">
+                    <h5 id="addTaskHeader" style="margin-bottom: 10px; font-weight: 700;">Add New Task</h5>
+                    <input type="hidden" id="targetModuleId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="taskOrder">Order Number *</label>
+                            <input type="number" id="taskOrder" required min="1" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="taskTitle">Task Title *</label>
+                            <input type="text" id="taskTitle" required placeholder="e.g. Variables & Data Types">
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                        <button type="button" class="btn btn-secondary" id="cancelTaskBtn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Task</button>
+                    </div>
+                </form>
+
+                <div id="roadmapModulesTree" class="roadmap-tree">
+                    <p style="color: var(--text-muted);">Loading modules...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-close>Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Add Resource -->
+    <div id="resourceModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Add Resource</h3>
+                <button class="modal-close" data-close>&times;</button>
+            </div>
+            <form id="resourceForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="resourceCommunitySelect">Community *</label>
+                        <select id="resourceCommunitySelect" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="resourceTitle">Title *</label>
+                        <input type="text" id="resourceTitle" required placeholder="e.g. Introduction to Data Structures">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="resourceType">Resource Type *</label>
+                            <select id="resourceType" required>
+                                <option value="PDF">PDF Document</option>
+                                <option value="Video">Video Tutorial</option>
+                                <option value="Article">Article / Guide</option>
+                                <option value="Link">Web Reference / Doc</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="resourceDifficulty">Difficulty</label>
+                            <select id="resourceDifficulty">
+                                <option value="Beginner">Beginner</option>
+                                <option value="Intermediate">Intermediate</option>
+                                <option value="Advanced">Advanced</option>
+                                <option value="All Levels">All Levels</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="resourceUrl">Resource URL *</label>
+                        <input type="url" id="resourceUrl" required placeholder="https://example.com/guide">
+                    </div>
+                    <div class="form-group">
+                        <label for="resourceDescription">Description</label>
+                        <textarea id="resourceDescription" rows="2" placeholder="Helpful summary for students..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-close>Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Resource</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Add Announcement -->
+    <div id="announcementModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Post Announcement</h3>
+                <button class="modal-close" data-close>&times;</button>
+            </div>
+            <form id="announcementForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="announcementCommunitySelect">Community *</label>
+                        <select id="announcementCommunitySelect" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="announcementTitle">Title *</label>
+                        <input type="text" id="announcementTitle" required placeholder="e.g. Weekly Challenge is now live!">
+                    </div>
+                    <div class="form-group">
+                        <label for="announcementContent">Content *</label>
+                        <textarea id="announcementContent" rows="4" required placeholder="Write your broadcast announcement..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-close>Cancel</button>
+                    <button type="submit" class="btn btn-primary">Publish Announcement</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Add Challenge -->
+    <div id="challengeModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>New Challenge</h3>
+                <button class="modal-close" data-close>&times;</button>
+            </div>
+            <form id="challengeForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="challengeCommunitySelect">Community *</label>
+                        <select id="challengeCommunitySelect" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="challengeTitle">Challenge Title *</label>
+                        <input type="text" id="challengeTitle" required placeholder="e.g. Two Sum Problem">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="challengeDifficulty">Difficulty *</label>
+                            <select id="challengeDifficulty" required>
+                                <option value="Easy">Easy</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Hard">Hard</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="challengeXp">XP Reward *</label>
+                            <input type="number" id="challengeXp" required min="10" value="100">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="challengeDescription">Description</label>
+                        <textarea id="challengeDescription" rows="3" placeholder="Challenge details, problem statement, or instructions..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-close>Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Challenge</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Add Event -->
+    <div id="eventModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>New Community Event</h3>
+                <button class="modal-close" data-close>&times;</button>
+            </div>
+            <form id="eventForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="eventCommunitySelect">Community *</label>
+                        <select id="eventCommunitySelect" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventTitle">Event Title *</label>
+                        <input type="text" id="eventTitle" required placeholder="e.g. Live DSA Mentorship Session">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="eventDate">Event Date & Time *</label>
+                            <input type="datetime-local" id="eventDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventStatus">Status</label>
+                            <select id="eventStatus">
+                                <option value="upcoming">Upcoming</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventDescription">Description</label>
+                        <textarea id="eventDescription" rows="3" placeholder="Event details, mentor info, meeting links..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-close>Cancel</button>
+                    <button type="submit" class="btn btn-primary">Schedule Event</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="../js/api.js"></script>
     <script src="../js/admin.js"></script>
 </body>

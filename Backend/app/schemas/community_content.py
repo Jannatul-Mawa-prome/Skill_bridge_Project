@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ChallengeResponse(BaseModel):
@@ -27,6 +27,11 @@ class ResourceResponse(BaseModel):
     description: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class DiscussionCreate(BaseModel):
+    title: str = Field(..., min_length=1, max_length=200)
+    content: str | None = None
 
 
 class DiscussionResponse(BaseModel):
