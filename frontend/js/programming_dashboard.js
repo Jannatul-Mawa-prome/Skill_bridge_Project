@@ -177,8 +177,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </span>
             `).join("");
 
+            const continueBtn = statusClass === "current"
+                ? `<button type="button" class="module-btn" style="margin-top: 14px;">Continue Module <i class="fa-solid fa-arrow-right"></i></button>`
+                : "";
+
             return `
-                <div class="roadmap-item ${statusClass}">
+                <div class="roadmap-item visible ${statusClass}">
                     <div class="timeline-dot"><i class="fa-solid ${icon}"></i></div>
                     <div class="roadmap-item-content">
                         <div class="module-heading">
@@ -190,14 +194,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                         </div>
                         <p>${escapeHtml(module.description || "")}</p>
                         
-                        <div class="module-progress-row" style="margin: 10px 0;">
-                            <div class="small-progress" style="background:#e2e8f0; height:6px; border-radius:999px; overflow:hidden; flex:1;">
-                                <div style="width: ${module.progress_percentage || 0}%; height:100%; background:#2563eb; transition: width 0.3s ease;"></div>
+                        <div class="module-progress-row">
+                            <div class="small-progress">
+                                <div style="width: ${module.progress_percentage || 0}%;"></div>
                             </div>
-                            <span style="font-size: 11px; font-weight: 700; color: #64748b; margin-left: 8px;">${module.progress_percentage || 0}%</span>
+                            <span>${module.progress_percentage || 0}%</span>
                         </div>
 
                         <div class="module-tasks">${tasks || "<small style='color:#94a3b8;'>No tasks listed</small>"}</div>
+                        ${continueBtn}
                     </div>
                 </div>
             `;
