@@ -153,6 +153,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             // =================================================
 
             let isMember = false;
+            let membershipStatus = "none";
 
 
             if (token) {
@@ -219,6 +220,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                             await membershipResponse.json();
 
 
+                        membershipStatus =
+                            membershipData.status || "none";
+
                         isMember =
                             membershipData.is_member === true;
 
@@ -226,6 +230,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         console.log(
                             "Membership:",
                             community.name,
+                            membershipStatus,
                             isMember
                         );
 
@@ -250,14 +255,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             // =================================================
 
             let buttonText =
-                "Explore Community";
+                "Request to Join";
 
-
-            if (isMember) {
-
-                buttonText =
-                    "Your Dashboard";
-
+            if (membershipStatus === "pending") {
+                buttonText = "Pending";
+            }
+            else if (membershipStatus === "rejected") {
+                buttonText = "Rejected";
+            }
+            else if (membershipStatus === "suspended") {
+                buttonText = "Suspended";
+            }
+            else if (isMember) {
+                buttonText = "Open Dashboard";
             }
 
 
@@ -441,70 +451,44 @@ document.addEventListener("DOMContentLoaded", async () => {
                     // MEMBER
                     // =========================================
 
+                    if (membershipStatus === "pending") {
+                        alert("Your request is waiting for admin approval.");
+                        return;
+                    }
+
+                    if (membershipStatus === "rejected") {
+                        alert("Your previous request was rejected.");
+                        return;
+                    }
+
+                    if (membershipStatus === "suspended") {
+                        alert("Your membership is suspended. Please contact the admin.");
+                        return;
+                    }
+
                     if (isMember) {
-
-                        console.log(
-                            "User is a member of:",
-                            community.name
-                        );
-
-
-                        // -------------------------------
-                        // PROGRAMMING DASHBOARD
-                        // -------------------------------
-
                         if (isProgramming) {
-
-                            window.location.href =
-                                `programming_dashboard.html?id=${community.id}`;
-
+                            window.location.href = `programming_dashboard.html?id=${community.id}`;
                             return;
                         }
-
-
-                        // -------------------------------
-                        // WEB DEVELOPMENT DASHBOARD
-                        // -------------------------------
 
                         if (isWebDevelopment) {
-
-                            window.location.href =
-                                `web_development_dashboard.html?id=${community.id}`;
-
+                            window.location.href = `web_development_dashboard.html?id=${community.id}`;
                             return;
                         }
 
-
-                        alert(
-                            "Dashboard is not available for this community yet."
-                        );
-
+                        alert("Dashboard is not available for this community yet.");
                         return;
                     }
 
-
-                    // =========================================
-                    // NOT MEMBER
-                    // =========================================
-
-                    console.log(
-                        "User is not a member of:",
-                        community.name
-                    );
-
+                    console.log("User is not an approved member of:", community.name);
 
                     if (explorePage !== "#") {
-
-                        window.location.href =
-                            explorePage;
-
+                        window.location.href = explorePage;
                         return;
                     }
 
-
-                    alert(
-                        "Community page is not available yet."
-                    );
+                    alert("Community page is not available yet.");
 
                 }
             );

@@ -23,8 +23,17 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-        
+
     user = db.execute(select(User).where(User.id == int(user_id))).scalars().first()
     if user is None:
         raise credentials_exception
     return user
+
+
+def get_current_admin(current_user: User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required."
+        )
+    return current_user

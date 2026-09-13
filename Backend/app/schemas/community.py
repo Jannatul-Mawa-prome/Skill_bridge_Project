@@ -36,10 +36,53 @@ class RoadmapSchema(BaseModel):
     completed_tasks: int
     modules: List[ModuleSchema]
 
+class ResourceSchema(BaseModel):
+    id: int
+    community_id: int
+    module_id: Optional[int] = None
+    title: str
+    resource_type: str
+    difficulty: Optional[str] = None
+    url: str
+    description: Optional[str] = None
+    is_active: bool = True
+
+
+class ResourceCreateRequest(BaseModel):
+    community_id: int
+    module_id: Optional[int] = None
+    title: str
+    resource_type: str
+    difficulty: Optional[str] = None
+    url: str
+    description: Optional[str] = None
+
+
+class ResourceUpdateRequest(BaseModel):
+    community_id: Optional[int] = None
+    module_id: Optional[int] = None
+    title: Optional[str] = None
+    resource_type: Optional[str] = None
+    difficulty: Optional[str] = None
+    url: Optional[str] = None
+    description: Optional[str] = None
+    is_active: Optional[bool] = None
+
+class AnnouncementSchema(BaseModel):
+    id: int
+    title: str
+    content: str
+    created_at: Optional[str] = None
+    author_name: Optional[str] = None
+
 class DashboardResponse(BaseModel):
     user_name: str
+    community_id: int
+    community_name: str
     stats: DashboardStatsResponse
     roadmap: Optional[RoadmapSchema] = None
+    resources: List[ResourceSchema] = []
+    announcements: List[AnnouncementSchema] = []
 
 class CommunityListSchema(BaseModel):
     id: int
@@ -48,3 +91,35 @@ class CommunityListSchema(BaseModel):
     active_members_count: int
     topics: List[str] = [] # Can be generated dynamically later
     challenges_count: int = 0
+
+
+class AdminMembershipSummarySchema(BaseModel):
+    id: int
+    user_id: int
+    community_id: int
+    community_name: str
+    student_name: str
+    student_email: str
+    student_roll: Optional[str] = None
+    status: str
+    request_date: str
+
+
+class AdminMembershipDetailSchema(BaseModel):
+    id: int
+    user_id: int
+    community_id: int
+    community_name: str
+    student_name: str
+    student_email: str
+    student_roll: Optional[str] = None
+    status: str
+    request_date: str
+    answers: dict
+
+
+class AdminMembershipActionSchema(BaseModel):
+    membership_id: int
+    community_id: int
+    status: str
+    message: str

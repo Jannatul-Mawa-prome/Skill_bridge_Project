@@ -47,7 +47,8 @@ class CommunityMembership(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
     community_id: Mapped[int] = mapped_column(ForeignKey("communities.id", ondelete="CASCADE"), index=True)
-    
+
+    status: Mapped[str] = mapped_column(String(20), default="pending", nullable=False)
     role: Mapped[str] = mapped_column(String(50), default="member")
     streak: Mapped[int] = mapped_column(Integer, default=0)
     joined_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

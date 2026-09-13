@@ -8,6 +8,11 @@ class RoadmapCreate(BaseModel):
     description: Optional[str] = None
 
 
+class RoadmapUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+
+
 class RoadmapResponse(BaseModel):
     id: int
     community_id: int
@@ -24,6 +29,12 @@ class ModuleCreate(BaseModel):
     description: Optional[str] = None
 
 
+class ModuleUpdate(BaseModel):
+    order: Optional[int] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+
+
 class ModuleResponse(BaseModel):
     id: int
     roadmap_id: int
@@ -37,6 +48,11 @@ class ModuleResponse(BaseModel):
 class TaskCreate(BaseModel):
     order: int
     title: str
+
+
+class TaskUpdate(BaseModel):
+    order: Optional[int] = None
+    title: Optional[str] = None
 
 
 class TaskResponse(BaseModel):

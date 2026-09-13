@@ -26,6 +26,12 @@ class User(Base):
         nullable=False
     )
 
+    role: Mapped[str] = mapped_column(
+        String(50),
+        default="member",
+        nullable=False
+    )
+
     is_verified: Mapped[bool] = mapped_column(
         Boolean,
         default=False

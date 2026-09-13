@@ -31,19 +31,27 @@ class CommunityRepository:
             .where(CommunityMembership.community_id == community_id)
         ).scalar_one_or_none()
 
+    def get_membership_by_id(self, membership_id: int) -> CommunityMembership | None:
+        return self.db.execute(
+            select(CommunityMembership)
+            .where(CommunityMembership.id == membership_id)
+        ).scalar_one_or_none()
+
+    def get_pending_memberships(self) -> list[CommunityMembership]:
+        return self.db.execute(
+            select(CommunityMembership)
+            .where(CommunityMembership.status == "pending")
+        ).scalars().all()
+
     def create_membership(self, user_id: int, community_id: int, assessment_data: JoinCommunityRequest) -> CommunityMembership:
-        # Create membership
-        membership = CommunityMembership(user_id=user_id, community_id=community_id)
+        membership = CommunityMembership(
+            user_id=user_id,
+            community_id=community_id,
+            status="pending"
+        )
         self.db.add(membership)
-        self.db.flush() # To get membership.id
+        self.db.flush()
 
-        # Update community active members
-        community = self.get_community_by_id(community_id)
-        if community:
-            community.active_members_count += 1
-            self.db.add(community)
-
-        # Create assessment data
         assessment = AssessmentData(
             membership_id=membership.id,
             skill_level=assessment_data.skill_level,
@@ -53,7 +61,21 @@ class CommunityRepository:
             weekly_time_commitment=assessment_data.weekly_time_commitment
         )
         self.db.add(assessment)
-        
+
+        self.db.commit()
+        self.db.refresh(membership)
+        return membership
+
+    def update_membership_status(self, membership_id: int, status: str) -> CommunityMembership:
+        membership = self.get_membership_by_id(membership_id)
+        if membership is None:
+            raise ValueError("Membership not found")
+        membership.status = status
+        if status == "approved":
+            membership.role = "member"
+            membership.joined_at = __import__('datetime').datetime.utcnow()
+            if membership.community is not None:
+                membership.community.active_members_count = max(0, membership.community.active_members_count + 1)
         self.db.commit()
         self.db.refresh(membership)
         return membership

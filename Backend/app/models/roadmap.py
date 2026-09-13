@@ -9,6 +9,7 @@ from app.database.connection import Base
 if TYPE_CHECKING:
     from app.models.community import Community
     from app.models.user import User
+    from app.models.resource import Resource
 
 
 class Roadmap(Base):
@@ -40,6 +41,7 @@ class Module(Base):
 
     roadmap: Mapped["Roadmap"] = relationship(back_populates="modules")
     tasks: Mapped[List["Task"]] = relationship(back_populates="module", cascade="all, delete-orphan")
+    resources: Mapped[List["Resource"]] = relationship(back_populates="module")
 
 
 class Task(Base):
