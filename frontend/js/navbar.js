@@ -27,7 +27,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    const fullName = localStorage.getItem("full_name");
+    const token = localStorage.getItem("access_token");
+    const storedName = localStorage.getItem("full_name");
+    const fullName = (storedName && storedName !== "null" && storedName !== "undefined")
+        ? storedName
+        : (token ? (localStorage.getItem("edu_email") || "Student") : null);
 
     const loginBtn = document.getElementById("loginBtn");
     const signupBtn = document.getElementById("signupBtn");
@@ -99,10 +103,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
             logoutBtn.addEventListener("click", () => {
 
-                localStorage.removeItem("access_token");
-                localStorage.removeItem("user_id");
-                localStorage.removeItem("edu_email");
-                localStorage.removeItem("full_name");
+                if (window.skillBridgeApi && window.skillBridgeApi.clearSession) {
+                    window.skillBridgeApi.clearSession();
+                } else {
+                    localStorage.removeItem("access_token");
+                    localStorage.removeItem("user_id");
+                    localStorage.removeItem("edu_email");
+                    localStorage.removeItem("full_name");
+                }
 
                 window.location.href = "index.html";
 
@@ -110,6 +118,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         }
 
+    } else {
+        if (userMenu) {
+            userMenu.style.display = "none";
+        }
     }
 
 });

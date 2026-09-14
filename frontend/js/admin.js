@@ -504,13 +504,17 @@ document.addEventListener("DOMContentLoaded", () => {
     function renderMemberships(items) {
         const tbody = document.getElementById("membershipsTable");
         if (!tbody) return;
-        tbody.innerHTML = items.map(m => `
+        tbody.innerHTML = items.map(m => {
+            const comm = loadedCommunities.find(c => c.id === m.community_id);
+            const commName = comm ? escapeHtml(comm.name) : `Community #${m.community_id}`;
+            const statusClass = m.status === 'approved' ? 'badge-success' : (m.status === 'rejected' ? 'badge-danger' : 'badge-warning');
+            return `
             <tr>
                 <td>#${m.id}</td>
                 <td>User #${m.user_id}</td>
-                <td>Community #${m.community_id}</td>
+                <td><strong>${commName}</strong></td>
                 <td><span class="badge">${escapeHtml(m.role)}</span></td>
-                <td><span class="badge ${m.status === 'approved' ? 'badge-success' : 'badge-warning'}">${escapeHtml(m.status)}</span></td>
+                <td><span class="badge ${statusClass}">${escapeHtml(m.status)}</span></td>
                 <td><span class="badge ${m.is_active ? 'badge-success' : 'badge-danger'}">${m.is_active ? 'Active' : 'Inactive'}</span></td>
                 <td>
                     <button class="action ${m.is_active ? 'danger' : 'success'}" data-toggle-membership-status="${m.id}" data-status="${m.is_active}">
@@ -518,7 +522,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     </button>
                 </td>
             </tr>
-        `).join("");
+            `;
+        }).join("");
     }
 
     // ============================================

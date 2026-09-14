@@ -369,6 +369,18 @@ class AdminService:
                         answer=ans.answer,
                     )
                 )
+            if not answers and req.assessment:
+                if req.assessment.skill_level:
+                    answers.append(AdminJoinRequestAnswer(question_id=0, question_key="skill_level", prompt="Skill Level", answer=req.assessment.skill_level))
+                if req.assessment.languages_known:
+                    answers.append(AdminJoinRequestAnswer(question_id=0, question_key="languages_known", prompt="Languages / Technologies", answer=req.assessment.languages_known))
+                if req.assessment.problem_solving_comfort:
+                    answers.append(AdminJoinRequestAnswer(question_id=0, question_key="problem_solving_comfort", prompt="Problem Solving", answer=req.assessment.problem_solving_comfort))
+                if req.assessment.main_goal:
+                    answers.append(AdminJoinRequestAnswer(question_id=0, question_key="main_goal", prompt="Main Goal", answer=req.assessment.main_goal))
+                if req.assessment.weekly_time_commitment:
+                    answers.append(AdminJoinRequestAnswer(question_id=0, question_key="weekly_time_commitment", prompt="Weekly Commitment", answer=req.assessment.weekly_time_commitment))
+
             result.append(
                 AdminJoinRequestResponse(
                     membership_id=req.id,
@@ -393,20 +405,22 @@ class AdminService:
         if not membership:
             raise HTTPException(status_code=404, detail="Join request not found")
 
-        if membership.status == "approved":
-            return AdminMembershipResponse.model_validate(membership)
-
         membership.status = "approved"
         membership.is_active = True
         membership.reviewed_at = datetime.utcnow()
         membership.reviewer_id = current_admin.id
+        saved = self._save(membership)
 
         community = self.repo.get_community(membership.community_id)
         if community:
-            community.active_members_count += 1
+            community.active_members_count = self.repo.count(
+                CommunityMembership,
+                CommunityMembership.community_id == membership.community_id,
+                CommunityMembership.is_active.is_(True),
+                CommunityMembership.status == "approved",
+            )
             self.repo.save(community)
 
-        saved = self._save(membership)
         return AdminMembershipResponse.model_validate(saved)
 
     def reject_join_request(self, membership_id: int, current_admin: User) -> AdminMembershipResponse:
@@ -414,19 +428,22 @@ class AdminService:
         if not membership:
             raise HTTPException(status_code=404, detail="Join request not found")
 
-        was_approved = (membership.status == "approved")
         membership.status = "rejected"
         membership.is_active = False
         membership.reviewed_at = datetime.utcnow()
         membership.reviewer_id = current_admin.id
-
-        if was_approved:
-            community = self.repo.get_community(membership.community_id)
-            if community and community.active_members_count > 0:
-                community.active_members_count -= 1
-                self.repo.save(community)
-
         saved = self._save(membership)
+
+        community = self.repo.get_community(membership.community_id)
+        if community:
+            community.active_members_count = self.repo.count(
+                CommunityMembership,
+                CommunityMembership.community_id == membership.community_id,
+                CommunityMembership.is_active.is_(True),
+                CommunityMembership.status == "approved",
+            )
+            self.repo.save(community)
+
         return AdminMembershipResponse.model_validate(saved)
 
     def challenges(self, community_id: int | None = None) -> list[Challenge]:

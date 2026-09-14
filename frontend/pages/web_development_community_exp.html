@@ -27,6 +27,8 @@
 
     <link rel="stylesheet"
           href="../css/web_development_community_exp.css">
+    <link rel="stylesheet"
+          href="../css/navbar.css">
 
 </head>
 
@@ -38,52 +40,57 @@
      NAVBAR
      ===================================================== -->
 
-<header class="navbar">
-
-    <div class="nav-container">
-
+<header>
+    <nav class="navbar">
         <a href="index.html" class="logo">
-
-            <div class="logo-icon">
-                <i class="fa-solid fa-book-open"></i>
-            </div>
-
-            <span>
-                Skill<span>Bridge</span>
-            </span>
-
+            <img src="../assets/images/logo1.png" alt="SkillBridge Logo" style="height: 30px; width: auto;">
+            <span class="logo-text">Skill<span class="highlight">Bridge</span></span>
         </a>
-
-
-        <nav class="nav-links">
-
+        <ul class="nav-links" id="navLinks">
             <a href="index.html">Home</a>
 
             <a href="community.html" class="active">
                 Communities
             </a>
 
-            <a href="#">Learning</a>
+            <a href="roadmap.html" id="roadmapLink">Roadmaps</a>
 
-            <a href="#">Challenges</a>
-
-        </nav>
-
-
-        <div class="nav-buttons">
-
-            <a href="#" class="login-btn">
-                Log in
+            <a href="about.html">About</a>
+        </ul>
+        <div class="nav-buttons" id="navButtons">
+            <a href="login.html" class="login-btn" id="loginBtn">
+                Login
             </a>
 
-            <a href="#" class="get-started-btn">
+            <a href="register.html" class="signup-btn" id="signupBtn">
                 Get Started
             </a>
 
+            <div class="user-menu" id="userMenu" style="display: none;">
+                <button class="user-menu-btn" id="userMenuBtn">
+                    <span id="userName" style="color: #2563eb;"></span>
+                    <span class="dropdown-arrow">▾</span>
+                </button>
+
+                <div class="user-dropdown" id="userDropdown">
+                    <a href="#" class="dropdown-item">
+                        <span>👤</span>
+                        Profile
+                    </a>
+
+                    <button class="dropdown-item logout-btn" id="logoutBtn">
+                        <span>🚪</span>
+                        Logout
+                    </button>
+                </div>
+            </div>
         </div>
-
-    </div>
-
+        <div class="menu-toggle" id="mobileMenu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
 </header>
 
 
@@ -180,6 +187,7 @@
         <div class="join-area">
 
             <button class="join-btn"
+                    id="openJoinModal"
                     onclick="openModal()">
 
                 <i class="fa-solid fa-user-plus"></i>
@@ -482,6 +490,7 @@
 
 
     <button class="cta-button"
+            id="ctaJoinBtn"
             onclick="openModal()">
 
         Join Community
@@ -512,7 +521,6 @@
 
 <div class="modal-overlay" id="joinModal">
 
-```
 <div class="join-modal">
 
     <!-- Close Button -->
@@ -1028,11 +1036,11 @@
     </form>
 
 </div>
-```
 
 </div>
 
 <script src="../js/api.js"></script>
+<script src="../js/navbar.js"></script>
 <script>
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -1070,9 +1078,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const submitBtn =
         document.getElementById("submitBtn");
-
+    const openJoinBtn =
+        document.getElementById("openJoinModal");
+    const ctaJoinBtn =
+        document.getElementById("ctaJoinBtn");
+    const joinSubtext =
+        document.querySelector(".join-area > span");
 
     let currentQuestion = 0;
+    let currentMembershipStatus = "none";
+    let pageCommunityId = new URLSearchParams(window.location.search).get("id");
 
 
     /* =====================================================
@@ -1080,16 +1095,28 @@ document.addEventListener("DOMContentLoaded", () => {
        ===================================================== */
 
     window.openModal = function () {
+        const token = skillBridgeApi.getToken();
+        if (!token) {
+            alert("Please log in first to join the community.");
+            window.location.href = "login.html";
+            return;
+        }
 
-    joinModal.classList.add("show");
+        if (currentMembershipStatus === "pending") {
+            alert("Your join request is already pending administrator approval.");
+            return;
+        }
 
-    document.body.style.overflow = "hidden";
+        if (currentMembershipStatus === "approved") {
+            window.location.href = `web_development_dashboard.html?id=${pageCommunityId}`;
+            return;
+        }
 
-    currentQuestion = 0;
-
-    showQuestion(currentQuestion);
-
-};
+        joinModal.classList.add("show");
+        document.body.style.overflow = "hidden";
+        currentQuestion = 0;
+        showQuestion(currentQuestion);
+    };
 
 
     /* =====================================================
@@ -1232,6 +1259,110 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
+    function applyMembershipUI(membership) {
+        currentMembershipStatus = membership ? membership.status : "none";
+        const isMember = membership && membership.is_member && membership.status === "approved";
+
+        if (currentMembershipStatus === "pending") {
+            if (openJoinBtn) {
+                openJoinBtn.innerHTML = `<i class="fa-solid fa-clock"></i> Pending`;
+                openJoinBtn.classList.add("pending");
+                openJoinBtn.classList.remove("approved");
+                openJoinBtn.disabled = true;
+                openJoinBtn.title = "Your join request is pending administrator approval";
+            }
+            if (ctaJoinBtn) {
+                ctaJoinBtn.innerHTML = `Pending Approval <i class="fa-solid fa-clock"></i>`;
+                ctaJoinBtn.classList.add("pending");
+                ctaJoinBtn.classList.remove("approved");
+                ctaJoinBtn.disabled = true;
+                ctaJoinBtn.title = "Your join request is pending administrator approval";
+            }
+            if (joinSubtext) {
+                joinSubtext.textContent = "Request under admin review";
+            }
+        } else if (isMember) {
+            const dashUrl = `web_development_dashboard.html?id=${pageCommunityId}`;
+            if (openJoinBtn) {
+                openJoinBtn.innerHTML = `<i class="fa-solid fa-gauge"></i> Go to Dashboard`;
+                openJoinBtn.classList.remove("pending");
+                openJoinBtn.classList.add("approved");
+                openJoinBtn.disabled = false;
+                openJoinBtn.title = "Access Community Dashboard";
+                openJoinBtn.onclick = () => { window.location.href = dashUrl; };
+            }
+            if (ctaJoinBtn) {
+                ctaJoinBtn.innerHTML = `Go to Dashboard <i class="fa-solid fa-arrow-right"></i>`;
+                ctaJoinBtn.classList.remove("pending");
+                ctaJoinBtn.classList.add("approved");
+                ctaJoinBtn.disabled = false;
+                ctaJoinBtn.onclick = () => { window.location.href = dashUrl; };
+            }
+            if (joinSubtext) {
+                joinSubtext.textContent = "You are an active member";
+            }
+        } else {
+            // none or rejected
+            if (openJoinBtn) {
+                openJoinBtn.innerHTML = `<i class="fa-solid fa-user-plus"></i> Join Community`;
+                openJoinBtn.classList.remove("pending", "approved");
+                openJoinBtn.disabled = false;
+                openJoinBtn.title = "";
+                openJoinBtn.onclick = window.openModal;
+            }
+            if (ctaJoinBtn) {
+                ctaJoinBtn.innerHTML = `Join Community <i class="fa-solid fa-arrow-right"></i>`;
+                ctaJoinBtn.classList.remove("pending", "approved");
+                ctaJoinBtn.disabled = false;
+                ctaJoinBtn.onclick = window.openModal;
+            }
+            if (joinSubtext) {
+                joinSubtext.textContent = "Free to join • Learn together";
+            }
+        }
+    }
+
+    async function checkAndRenderMembershipStatus() {
+        if (!pageCommunityId) {
+            try {
+                const res = await skillBridgeApi.request("/api/v1/communities");
+                if (res.ok) {
+                    const list = await skillBridgeApi.parseJson(res);
+                    const match = list.find(c => (c.name || "").toLowerCase().includes("web"));
+                    if (match) {
+                        pageCommunityId = String(match.id);
+                        const url = new URL(window.location);
+                        url.searchParams.set("id", pageCommunityId);
+                        window.history.replaceState({}, "", url);
+                    }
+                }
+            } catch (e) {
+                console.error("Error resolving community id:", e);
+            }
+            if (!pageCommunityId) pageCommunityId = "3";
+        }
+
+        const token = skillBridgeApi.getToken();
+        if (!token) {
+            applyMembershipUI({ is_member: false, status: "none" });
+            return;
+        }
+
+        try {
+            const res = await skillBridgeApi.request(`/api/v1/communities/${pageCommunityId}/membership`);
+            if (res.status === 401) {
+                applyMembershipUI({ is_member: false, status: "none" });
+                return;
+            }
+            if (res.ok) {
+                const data = await skillBridgeApi.parseJson(res);
+                applyMembershipUI(data);
+            }
+        } catch (e) {
+            console.error("Failed to check membership status:", e);
+        }
+    }
+
     /* =====================================================
        JOIN COMMUNITY / FORM SUBMIT
        ===================================================== */
@@ -1240,41 +1371,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
         event.preventDefault();
 
-
-        /* -----------------------------------------------
-           CHECK LOGIN
-           ----------------------------------------------- */
-
-        const token =
-            localStorage.getItem("access_token");
-
+        const token = skillBridgeApi.getToken();
 
         if (!token) {
-
             alert(
                 "Please log in first to join the community."
             );
-
-            window.location.href =
-                "login.html";
-
+            window.location.href = "login.html";
             return;
-
         }
-
 
         /* -----------------------------------------------
            GET FORM DATA
            ----------------------------------------------- */
 
-        const formData =
-            new FormData(joinForm);
-
+        const formData = new FormData(joinForm);
 
         const skillLevel =
-            formData.get("level") ||
-            "beginner";
-
+            formData.get("level") || "beginner";
 
         const technologies =
             formData.getAll("technology");
@@ -1284,16 +1398,11 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-
         const goal =
-            formData.get("goal") ||
-            "learn";
-
+            formData.get("goal") || "learn";
 
         const timeCommitment =
-            formData.get("time") ||
-            "1-2";
-
+            formData.get("time") || "1-2";
 
         /* -----------------------------------------------
            PREPARE DATA FOR BACKEND
@@ -1311,21 +1420,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ]
         };
 
-
-        /* -----------------------------------------------
-           GET COMMUNITY ID
-           ----------------------------------------------- */
-
-        const urlParams = new URLSearchParams(window.location.search);
-
-        const communityId = urlParams.get("id");
-
-        if (!communityId) {
-            alert("Community ID not found.");
-            window.location.href = "community.html";
-            return;
-        }
-
+        const communityId = pageCommunityId || "3";
 
         /* -----------------------------------------------
            SUBMIT TO BACKEND
@@ -1334,69 +1429,44 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
 
             submitBtn.disabled = true;
-
             submitBtn.innerHTML =
-                `Joining...
-                 <i class="fa-solid fa-spinner fa-spin"></i>`;
-
+                `Submitting... <i class="fa-solid fa-spinner fa-spin"></i>`;
 
             const response =
                 await skillBridgeApi.request(
-                    `http://127.0.0.1:8000/api/v1/communities/${communityId}/join`,
+                    `/api/v1/communities/${communityId}/join`,
                     {
                         method: "POST",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json",
-
-                            "Authorization":
-                                `Bearer ${token}`
-                        },
-
-                        body:
-                            JSON.stringify(data)
+                        body: JSON.stringify(data)
                     }
                 );
-
 
             /* -------------------------------------------
                SUCCESS
                ------------------------------------------- */
 
             if (response.ok) {
-
-                window.location.href =
-                    `web_development_dashboard.html?id=${communityId}`;
-
+                closeModal();
+                alert("Join request submitted successfully! Your request is pending administrator approval.");
+                applyMembershipUI({ is_member: false, status: "pending" });
                 return;
-
             }
-
 
             /* -------------------------------------------
                BACKEND ERROR
                ------------------------------------------- */
 
             let result;
-
             try {
-
-                result =
-                    await response.json();
-
+                result = await skillBridgeApi.parseJson(response);
             } catch {
-
                 result = {};
-
             }
 
-
             alert(
-                result.detail ||
-                "Failed to join community."
+                result?.detail || "Failed to join community."
             );
-
+            await checkAndRenderMembershipStatus();
 
         } catch (error) {
 
@@ -1405,16 +1475,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 error
             );
 
-
             alert(
                 "Server error. Please try again."
             );
 
-
         } finally {
 
             submitBtn.disabled = false;
-
             submitBtn.innerHTML =
                 `Join Community
                  <i class="fa-solid fa-check"></i>`;
@@ -1429,6 +1496,7 @@ document.addEventListener("DOMContentLoaded", () => {
        ===================================================== */
 
     showQuestion(0);
+    checkAndRenderMembershipStatus();
 
 });
 

@@ -1,0 +1,707 @@
+
+/* ==========================================
+   SkillBridge - About Page
+   ========================================== */
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #f8fafc;
+    color: #14213d;
+    overflow-x: hidden;
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+a {
+    text-decoration: none;
+}
+
+
+/* ==========================================
+   Common
+   ========================================== */
+
+.section-label {
+    display: inline-block;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+}
+
+.section-heading {
+    max-width: 720px;
+    margin: 0 auto 50px;
+    text-align: center;
+}
+
+.section-heading h2 {
+    margin: 0 0 14px;
+    font-size: 36px;
+    line-height: 1.2;
+    color: #0f172a;
+}
+
+.section-heading p {
+    margin: 0;
+    color: #64748b;
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+
+/* ==========================================
+   Hero
+   ========================================== */
+
+.about-hero {
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 90px 24px 100px;
+
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: center;
+    gap: 70px;
+}
+
+.about-hero-content h1 {
+    font-size: 52px;
+    line-height: 1.12;
+    letter-spacing: -1.5px;
+    color: #0f172a;
+    margin: 0 0 24px;
+}
+
+.about-hero-content h1 span {
+    display: block;
+    color: #2563eb;
+}
+
+.about-hero-content > p {
+    max-width: 650px;
+    color: #64748b;
+    font-size: 17px;
+    line-height: 1.8;
+    margin: 0 0 32px;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.primary-btn,
+.secondary-btn {
+    display: inline-block;
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.primary-btn {
+    background: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 5px 15px rgba(37, 99, 235, 0.22);
+}
+
+.primary-btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.secondary-btn {
+    color: #2563eb;
+    border: 1.5px solid #2563eb;
+    background: #ffffff;
+}
+
+.secondary-btn:hover {
+    background: #eff6ff;
+}
+
+
+/* ==========================================
+   Hero Visual
+   ========================================== */
+
+.about-hero-visual {
+    min-height: 390px;
+    background: linear-gradient(145deg, #eff6ff, #f8fafc);
+    border-radius: 24px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e2e8f0;
+}
+
+.main-card {
+    width: 290px;
+    padding: 35px;
+    text-align: center;
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 15px 40px rgba(15, 23, 42, 0.09);
+}
+
+.visual-icon {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 18px;
+    background: #eff6ff;
+    border-radius: 16px;
+    font-size: 30px;
+}
+
+.main-card h3 {
+    font-size: 21px;
+    margin: 0 0 10px;
+    color: #0f172a;
+}
+
+.main-card p {
+    color: #64748b;
+    line-height: 1.7;
+    font-size: 14px;
+    margin: 0;
+}
+
+.floating-card {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #ffffff;
+    padding: 12px 16px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.1);
+}
+
+.floating-card > span {
+    font-size: 22px;
+}
+
+.floating-card strong,
+.floating-card small {
+    display: block;
+}
+
+.floating-card strong {
+    font-size: 13px;
+    color: #1e293b;
+}
+
+.floating-card small {
+    color: #64748b;
+    font-size: 11px;
+    margin-top: 3px;
+}
+
+.card-one {
+    top: 45px;
+    left: 25px;
+}
+
+.card-two {
+    bottom: 45px;
+    right: 25px;
+}
+
+
+/* ==========================================
+   Purpose
+   ========================================== */
+
+.about-purpose {
+    padding: 90px 24px;
+    background: #f8fafc;
+}
+
+.purpose-grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.purpose-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 30px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.purpose-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.07);
+}
+
+.purpose-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #eff6ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 23px;
+    margin-bottom: 20px;
+}
+
+.purpose-card h3 {
+    margin: 0 0 10px;
+    font-size: 19px;
+}
+
+.purpose-card p {
+    color: #64748b;
+    line-height: 1.7;
+    font-size: 14px;
+    margin: 0;
+}
+
+
+/* ==========================================
+   Features
+   ========================================== */
+
+.features-section {
+    padding: 100px 24px;
+}
+
+.features-grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.feature-card {
+    padding: 28px;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    background: #ffffff;
+}
+
+.feature-number {
+    color: #2563eb;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 22px;
+}
+
+.feature-card h3 {
+    font-size: 18px;
+    margin: 0 0 10px;
+    color: #0f172a;
+}
+
+.feature-card p {
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.7;
+    margin: 0;
+}
+
+
+/* ==========================================
+   Communities
+   ========================================== */
+
+.communities-section {
+    padding: 100px 24px;
+    background: #f8fafc;
+}
+
+.community-about-grid {
+    max-width: 1050px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+}
+
+.community-about-card {
+    display: flex;
+    gap: 22px;
+    padding: 30px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+}
+
+.community-card-icon {
+    min-width: 58px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.programming-icon {
+    color: #2563eb;
+    background: #eff6ff;
+}
+
+.web-icon {
+    color: #7c3aed;
+    background: #f5f3ff;
+}
+
+.community-tag {
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.community-about-card h3 {
+    margin: 7px 0 9px;
+    font-size: 21px;
+}
+
+.community-about-card p {
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.7;
+    margin: 0 0 16px;
+}
+
+.community-topics {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+.community-topics span {
+    padding: 5px 9px;
+    background: #f1f5f9;
+    color: #475569;
+    border-radius: 5px;
+    font-size: 11px;
+}
+
+
+/* ==========================================
+   Roadmap
+   ========================================== */
+
+.roadmap-about-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 100px 24px;
+
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 80px;
+    align-items: center;
+}
+
+.roadmap-about-content h2 {
+    font-size: 36px;
+    line-height: 1.25;
+    margin: 0 0 18px;
+    color: #0f172a;
+}
+
+.roadmap-about-content p {
+    color: #64748b;
+    line-height: 1.8;
+    font-size: 15px;
+    margin: 0 0 25px;
+}
+
+.roadmap-steps {
+    padding-left: 10px;
+}
+
+.roadmap-step {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+}
+
+.step-number {
+    min-width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #eff6ff;
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.roadmap-step h3 {
+    margin: 0 0 6px;
+    font-size: 17px;
+}
+
+.roadmap-step p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.roadmap-line {
+    height: 28px;
+    border-left: 1px dashed #cbd5e1;
+    margin-left: 21px;
+}
+
+
+/* ==========================================
+   How It Works
+   ========================================== */
+
+.how-section {
+    padding: 100px 24px;
+    background: #f8fafc;
+}
+
+.how-grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.how-card {
+    background: #ffffff;
+    padding: 28px;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+}
+
+.how-number {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #2563eb;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.how-card h3 {
+    font-size: 17px;
+    margin: 0 0 10px;
+}
+
+.how-card p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+
+/* ==========================================
+   CTA
+   ========================================== */
+
+.about-cta {
+    padding: 90px 24px;
+    background: #eff6ff;
+}
+
+.cta-content {
+    max-width: 750px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.cta-content h2 {
+    margin: 0 0 16px;
+    font-size: 38px;
+    color: #0f172a;
+}
+
+.cta-content p {
+    max-width: 620px;
+    margin: 0 auto 28px;
+    color: #64748b;
+    line-height: 1.8;
+}
+
+.cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.cta-primary,
+.cta-secondary {
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.cta-primary {
+    color: #ffffff;
+    background: #2563eb;
+}
+
+.cta-secondary {
+    color: #2563eb;
+    background: #ffffff;
+    border: 1px solid #bfdbfe;
+}
+
+
+/* ==========================================
+   Responsive
+   ========================================== */
+
+@media (max-width: 992px) {
+
+    .about-hero {
+        grid-template-columns: 1fr;
+        gap: 45px;
+    }
+
+    .about-hero-content {
+        text-align: center;
+    }
+
+    .about-hero-content > p {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-actions {
+        justify-content: center;
+    }
+
+    .purpose-grid,
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .community-about-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .roadmap-about-section {
+        grid-template-columns: 1fr;
+        gap: 45px;
+    }
+
+    .how-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+@media (max-width: 768px) {
+
+    .about-hero {
+        padding: 60px 20px 70px;
+    }
+
+    .about-hero-content h1 {
+        font-size: 38px;
+    }
+
+    .about-hero-content > p {
+        font-size: 15px;
+    }
+
+    .about-hero-visual {
+        min-height: 330px;
+    }
+
+    .floating-card {
+        padding: 9px 12px;
+    }
+
+    .card-one {
+        left: 12px;
+        top: 25px;
+    }
+
+    .card-two {
+        right: 12px;
+        bottom: 25px;
+    }
+
+    .about-purpose,
+    .features-section,
+    .communities-section,
+    .roadmap-about-section,
+    .how-section {
+        padding: 70px 20px;
+    }
+
+    .section-heading h2 {
+        font-size: 30px;
+    }
+
+    .purpose-grid,
+    .features-grid,
+    .how-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .community-about-card {
+        flex-direction: column;
+    }
+
+    .roadmap-about-content h2 {
+        font-size: 30px;
+    }
+
+    .cta-content h2 {
+        font-size: 30px;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .about-hero-content h1 {
+        font-size: 32px;
+    }
+
+    .main-card {
+        width: 245px;
+        padding: 25px;
+    }
+
+    .floating-card {
+        display: none;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+```

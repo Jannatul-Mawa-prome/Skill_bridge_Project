@@ -19,7 +19,11 @@
             headers.set("Authorization", `Bearer ${token}`);
         }
 
-        const response = await fetch(`${API_BASE_URL}${path}`, {
+        const url = (path.startsWith("http://") || path.startsWith("https://"))
+            ? path
+            : `${API_BASE_URL}${path.startsWith('/') ? path : '/' + path}`;
+
+        const response = await fetch(url, {
             ...options,
             headers
         });

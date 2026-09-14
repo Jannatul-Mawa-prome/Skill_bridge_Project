@@ -132,6 +132,7 @@ class AdminRepository:
             .options(
                 joinedload(CommunityMembership.user).joinedload(User.profile),
                 joinedload(CommunityMembership.community),
+                joinedload(CommunityMembership.assessment),
                 selectinload(CommunityMembership.answers).joinedload(CommunityAnswer.question),
             )
             .where(CommunityMembership.status == status)
@@ -147,6 +148,7 @@ class AdminRepository:
             .options(
                 joinedload(CommunityMembership.user).joinedload(User.profile),
                 joinedload(CommunityMembership.community),
+                joinedload(CommunityMembership.assessment),
                 selectinload(CommunityMembership.answers).joinedload(CommunityAnswer.question),
             )
             .where(CommunityMembership.id == membership_id)

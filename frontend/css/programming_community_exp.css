@@ -464,6 +464,45 @@ a {
         0 12px 25px rgba(36, 99, 235, 0.3);
 }
 
+.join-btn:disabled,
+.join-btn.pending {
+    background: #f59e0b;
+    color: white;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.28);
+}
+
+.join-btn.approved {
+    background: #10b981;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.28);
+}
+
+.join-btn.approved:hover {
+    background: #059669;
+    transform: translateY(-2px);
+}
+
+.cta-button:disabled,
+.cta-button.pending {
+    background: #f59e0b !important;
+    color: white !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.28) !important;
+}
+
+.cta-button.approved {
+    background: #10b981 !important;
+    color: white !important;
+}
+
+.cta-button.approved:hover {
+    background: #059669 !important;
+}
+
 .join-area > span {
     display: block;
 

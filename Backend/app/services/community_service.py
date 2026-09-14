@@ -114,6 +114,10 @@ class CommunityService:
                 )
 
         questions = self.question_repo.get_active_questions(community_id)
+        if not questions:
+            self._auto_seed_community_questions(community)
+            questions = self.question_repo.get_active_questions(community_id)
+
         answer_pairs = self._validate_join_answers(questions, request)
         membership = self.community_repo.create_membership(
             user_id,
@@ -222,6 +226,94 @@ class CommunityService:
                 status_code=422,
                 detail=f"Invalid option(s) for '{question.question_key}': {', '.join(sorted(invalid))}",
             )
+
+    def _auto_seed_community_questions(self, community: Community) -> None:
+        name_lower = (community.name or "").lower()
+        if "programming" in name_lower:
+            prog_questions = [
+                ("skill_level", "What is your current programming level?", "single_choice", [
+                    {"value": "beginner", "label": "Beginner (New to programming)"},
+                    {"value": "intermediate", "label": "Intermediate (Know syntax, basics)"},
+                    {"value": "advanced", "label": "Advanced (Comfortable with DSA, projects)"},
+                ]),
+                ("languages_known", "Which programming languages do you know?", "multi_choice", [
+                    {"value": "cpp", "label": "C++"},
+                    {"value": "python", "label": "Python"},
+                    {"value": "java", "label": "Java"},
+                    {"value": "javascript", "label": "JavaScript"},
+                    {"value": "c", "label": "C"},
+                    {"value": "other", "label": "Other"},
+                ]),
+                ("problem_solving_comfort", "How comfortable are you with problem solving?", "single_choice", [
+                    {"value": "new", "label": "I'm completely new to problem solving"},
+                    {"value": "basic", "label": "I can solve basic problems"},
+                    {"value": "comfortable", "label": "I can solve intermediate problems"},
+                    {"value": "advanced", "label": "I regularly solve challenging problems"},
+                ]),
+                ("main_goal", "What is your main goal in this community?", "single_choice", [
+                    {"value": "learn", "label": "Learn Programming"},
+                    {"value": "problem-solving", "label": "Improve Problem Solving"},
+                    {"value": "competitive", "label": "Competitive Programming"},
+                    {"value": "projects", "label": "Build Projects"},
+                ]),
+                ("weekly_time_commitment", "How much time can you spend learning each week?", "single_choice", [
+                    {"value": "1-3", "label": "1–3 hrs per week"},
+                    {"value": "4-7", "label": "4–7 hrs per week"},
+                    {"value": "8-12", "label": "8–12 hrs per week"},
+                    {"value": "12+", "label": "12+ hrs per week"},
+                ]),
+            ]
+            for order, (key, prompt, qtype, options) in enumerate(prog_questions, start=1):
+                if not self.question_repo.get_question_by_key(community.id, key):
+                    self.question_repo.create_question(community.id, {
+                        "question_key": key,
+                        "prompt": prompt,
+                        "question_type": qtype,
+                        "options": options,
+                        "order": order,
+                        "is_required": True,
+                        "is_active": True,
+                    })
+
+        elif "web" in name_lower:
+            web_questions = [
+                ("skill_level", "What is your current web development experience level?", "single_choice", [
+                    {"value": "beginner", "label": "Beginner (New to web development)"},
+                    {"value": "intermediate", "label": "Intermediate (Built simple websites)"},
+                    {"value": "advanced", "label": "Advanced (Comfortable with frameworks & backend)"},
+                ]),
+                ("technologies_known", "Which web technologies have you used?", "multi_choice", [
+                    {"value": "html-css", "label": "HTML & CSS"},
+                    {"value": "javascript", "label": "JavaScript"},
+                    {"value": "react", "label": "React"},
+                    {"value": "nodejs", "label": "Node.js"},
+                    {"value": "backend", "label": "Backend"},
+                    {"value": "database", "label": "Database"},
+                ]),
+                ("main_goal", "What is your main web development goal?", "single_choice", [
+                    {"value": "learn", "label": "Learn Web Development"},
+                    {"value": "job", "label": "Prepare for a Job"},
+                    {"value": "projects", "label": "Build Projects"},
+                    {"value": "collaborate", "label": "Collaborate"},
+                ]),
+                ("weekly_time_commitment", "How much time can you spend learning each week?", "single_choice", [
+                    {"value": "1-2", "label": "1–2 hrs weekly"},
+                    {"value": "3-5", "label": "3–5 hrs weekly"},
+                    {"value": "5-10", "label": "5–10 hrs weekly"},
+                    {"value": "10+", "label": "10+ hrs weekly"},
+                ]),
+            ]
+            for order, (key, prompt, qtype, options) in enumerate(web_questions, start=1):
+                if not self.question_repo.get_question_by_key(community.id, key):
+                    self.question_repo.create_question(community.id, {
+                        "question_key": key,
+                        "prompt": prompt,
+                        "question_type": qtype,
+                        "options": options,
+                        "order": order,
+                        "is_required": True,
+                        "is_active": True,
+                    })
 
     # =========================================================
     # GET MY COMMUNITIES
@@ -366,6 +458,11 @@ class CommunityService:
 
             module_schemas = []
 
+            # Track whether the previous module is completed
+            # so the next module can be unlocked sequentially.
+            # The first module is always unlocked.
+            prev_module_completed = True
+
             for module in modules_sorted:
 
                 # Sort tasks
@@ -420,7 +517,9 @@ class CommunityService:
                     )
 
                 # -------------------------------------------------
-                # Module status
+                # Module status (sequential unlock)
+                # A module is unlocked only if the previous module
+                # is completed (or it is the first module).
                 # -------------------------------------------------
 
                 module_status = "locked"
@@ -429,12 +528,12 @@ class CommunityService:
 
                     module_status = "completed"
 
-                elif (
-                    mod_progress > 0
-                    or module.order == 1
-                ):
+                elif mod_progress > 0 or prev_module_completed:
 
                     module_status = "in_progress"
+
+                # Update flag for the next iteration
+                prev_module_completed = (module_status == "completed")
 
                 # -------------------------------------------------
                 # Module schema

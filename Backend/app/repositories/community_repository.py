@@ -1,5 +1,6 @@
+from datetime import datetime
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select, delete
 
 from app.models.community import Community, CommunityMembership, AssessmentData
 from app.models.community_answer import CommunityAnswer
@@ -73,6 +74,9 @@ class CommunityRepository:
         else:
             membership.status = status
             membership.is_active = (status == "approved")
+            membership.joined_at = datetime.utcnow()
+            membership.reviewed_at = None
+            membership.reviewer_id = None
             self.db.add(membership)
             self.db.flush()
 
@@ -83,6 +87,29 @@ class CommunityRepository:
                 community.active_members_count += 1
                 self.db.add(community)
 
+        # Extract assessment fields from answers if provided
+        ans_dict = {q.question_key: ans for q, ans in (answers or [])}
+        skill_level = ans_dict.get("skill_level") or assessment_data.skill_level
+        lang_val = (
+            ans_dict.get("languages_known")
+            or ans_dict.get("technologies_known")
+            or assessment_data.languages_known
+        )
+        languages_known = (
+            ",".join(lang_val)
+            if isinstance(lang_val, list)
+            else (str(lang_val) if lang_val else None)
+        )
+        problem_solving_comfort = (
+            ans_dict.get("problem_solving_comfort")
+            or assessment_data.problem_solving_comfort
+        )
+        main_goal = ans_dict.get("main_goal") or assessment_data.main_goal
+        weekly_time_commitment = (
+            ans_dict.get("weekly_time_commitment")
+            or assessment_data.weekly_time_commitment
+        )
+
         # Create or update assessment data
         assessment = self.db.execute(
             select(AssessmentData).where(AssessmentData.membership_id == membership.id)
@@ -91,28 +118,26 @@ class CommunityRepository:
         if not assessment:
             assessment = AssessmentData(
                 membership_id=membership.id,
-                skill_level=assessment_data.skill_level,
-                languages_known=",".join(assessment_data.languages_known) if assessment_data.languages_known else None,
-                problem_solving_comfort=assessment_data.problem_solving_comfort,
-                main_goal=assessment_data.main_goal,
-                weekly_time_commitment=assessment_data.weekly_time_commitment
+                skill_level=skill_level,
+                languages_known=languages_known,
+                problem_solving_comfort=problem_solving_comfort,
+                main_goal=main_goal,
+                weekly_time_commitment=weekly_time_commitment,
             )
             self.db.add(assessment)
         else:
-            assessment.skill_level = assessment_data.skill_level
-            if assessment_data.languages_known:
-                assessment.languages_known = ",".join(assessment_data.languages_known)
-            assessment.problem_solving_comfort = assessment_data.problem_solving_comfort
-            assessment.main_goal = assessment_data.main_goal
-            assessment.weekly_time_commitment = assessment_data.weekly_time_commitment
+            assessment.skill_level = skill_level
+            assessment.languages_known = languages_known
+            assessment.problem_solving_comfort = problem_solving_comfort
+            assessment.main_goal = main_goal
+            assessment.weekly_time_commitment = weekly_time_commitment
             self.db.add(assessment)
 
         # Delete previous answers if re-applying
-        existing_answers = self.db.execute(
-            select(CommunityAnswer).where(CommunityAnswer.membership_id == membership.id)
-        ).scalars().all()
-        for ans in existing_answers:
-            self.db.delete(ans)
+        self.db.execute(
+            delete(CommunityAnswer).where(CommunityAnswer.membership_id == membership.id)
+        )
+        self.db.flush()
 
         for question, answer in answers or []:
             self.db.add(
